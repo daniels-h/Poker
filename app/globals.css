@@ -87,3 +87,24 @@
   outline: 1px solid var(--brass);
   outline-offset: 2px;
 }
+
+/* Admin form elements — force ivory text on dark felt inputs */
+input, textarea, select {
+  color: var(--ivory) !important;
+  background-color: rgba(0,0,0,0.3);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--ivory-dim) !important;
+  opacity: 0.6;
+}
+label {
+  color: var(--ivory) !important;
+}
+/* shadcn Card titles and content on felt background */
+[class*="CardTitle"], [class*="CardDescription"] {
+  color: var(--ivory) !important;
+}
+/* shadcn Button text */
+button {
+  color: inherit;
+}

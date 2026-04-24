@@ -11,6 +11,7 @@ export const revalidate = 0
 
 export default async function DashboardPage() {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const { data: sessions } = await supabase
     .from('sessions')
@@ -68,7 +69,7 @@ export default async function DashboardPage() {
         eyebrow="Good evening"
         title="The Floor"
         subtitle="Who's up, who's down, who's buying the next round."
-        right={
+        right={user ? (
           <Link
             href="/sessions/new"
             className="font-mono uppercase transition-colors"
@@ -83,7 +84,7 @@ export default async function DashboardPage() {
           >
             + Log a Session
           </Link>
-        }
+        ) : undefined}
       />
 
       {/* Stats */}

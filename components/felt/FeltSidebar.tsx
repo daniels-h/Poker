@@ -27,9 +27,6 @@ export default function FeltSidebar() {
       {/* Header */}
       <div className="px-6 pt-7 pb-5" style={{ borderBottom: '1px solid rgba(138,115,64,0.4)' }}>
         <div className="font-fraunces text-ivory" style={{ fontSize: 22, lineHeight: 1.2 }}>The Club</div>
-        <div className="font-fraunces italic mt-1" style={{ fontSize: 11, color: 'var(--brass)' }}>
-          est. since we got bored
-        </div>
       </div>
 
       {/* Nav */}

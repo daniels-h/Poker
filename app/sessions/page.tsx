@@ -12,6 +12,7 @@ export const revalidate = 0
 
 export default async function SessionsPage({ searchParams }: { searchParams: { year?: string; month?: string } }) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   let query = supabase
     .from('sessions')
@@ -54,7 +55,7 @@ export default async function SessionsPage({ searchParams }: { searchParams: { y
         eyebrow="The Book"
         title="Sessions"
         subtitle="Every hand we've logged since we started keeping score."
-        right={
+        right={user ? (
           <Link
             href="/sessions/new"
             className="font-mono uppercase transition-colors"
@@ -62,7 +63,7 @@ export default async function SessionsPage({ searchParams }: { searchParams: { y
           >
             + Log a Session
           </Link>
-        }
+        ) : undefined}
       />
 
       <div className="grid grid-cols-3 gap-4 mb-6">
