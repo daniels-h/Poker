@@ -57,7 +57,7 @@ export default async function SessionsPage({ searchParams }: { searchParams: { y
         subtitle="Every hand we've logged since we started keeping score."
         right={user ? (
           <Link
-            href="/sessions/new"
+            href="/admin/sessions/new"
             className="font-mono uppercase transition-colors"
             style={{ fontSize: 11, letterSpacing: '0.15em', background: 'var(--brass)', color: 'var(--ink)', padding: '8px 16px', borderRadius: 2 }}
           >

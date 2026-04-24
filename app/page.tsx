@@ -71,7 +71,7 @@ export default async function DashboardPage() {
         subtitle="Who's up, who's down, who's buying the next round."
         right={user ? (
           <Link
-            href="/sessions/new"
+            href="/admin/sessions/new"
             className="font-mono uppercase transition-colors"
             style={{
               fontSize: 11,
