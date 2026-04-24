@@ -2,14 +2,65 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface Player { id: string; name: string; nickname: string | null; active: boolean }
+
+const fieldStyle = {
+  width: '100%',
+  background: 'rgba(0,0,0,0.35)',
+  border: '1px solid rgba(138,115,64,0.5)',
+  borderRadius: 2,
+  padding: '9px 12px',
+  color: 'var(--ivory)',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 13,
+  outline: 'none',
+}
+
+const labelStyle = {
+  display: 'block',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 10,
+  color: 'var(--brass)',
+  letterSpacing: '0.15em',
+  textTransform: 'uppercase' as const,
+  marginBottom: 6,
+}
+
+const btnPrimary = {
+  background: 'var(--brass)',
+  color: 'var(--ink)',
+  border: 'none',
+  borderRadius: 2,
+  padding: '8px 16px',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 11,
+  fontWeight: 600,
+  letterSpacing: '0.15em',
+  textTransform: 'uppercase' as const,
+  cursor: 'pointer',
+}
+
+const btnOutline = {
+  background: 'transparent',
+  color: 'var(--ivory)',
+  border: '1px solid rgba(138,115,64,0.5)',
+  borderRadius: 2,
+  padding: '5px 12px',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 10,
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase' as const,
+  cursor: 'pointer',
+}
+
+const card = {
+  background: 'rgba(0,0,0,0.25)',
+  border: '1px solid rgba(138,115,64,0.6)',
+  borderRadius: 4,
+  padding: '24px 28px',
+  marginBottom: 20,
+}
 
 export default function PlayersManager({ players: initialPlayers }: { players: Player[] }) {
   const [players, setPlayers] = useState<Player[]>(initialPlayers)
@@ -28,8 +79,7 @@ export default function PlayersManager({ players: initialPlayers }: { players: P
     const { data, error } = await supabase
       .from('players')
       .insert({ name: newName.trim(), nickname: newNickname.trim() || null, active: true })
-      .select()
-      .single()
+      .select().single()
     if (error) { setError(error.message); setAdding(false); return }
     setPlayers(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
     setNewName(''); setNewNickname('')
@@ -49,17 +99,12 @@ export default function PlayersManager({ players: initialPlayers }: { players: P
       .eq('id', id)
     if (error) { setError(error.message); return }
     setPlayers(prev => prev.map(p => p.id === id
-      ? { ...p, name: editName.trim(), nickname: editNickname.trim() || null }
-      : p
-    ))
+      ? { ...p, name: editName.trim(), nickname: editNickname.trim() || null } : p))
     setEditingId(null)
   }
 
   async function toggleActive(player: Player) {
-    const { error } = await supabase
-      .from('players')
-      .update({ active: !player.active })
-      .eq('id', player.id)
+    const { error } = await supabase.from('players').update({ active: !player.active }).eq('id', player.id)
     if (error) { setError(error.message); return }
     setPlayers(prev => prev.map(p => p.id === player.id ? { ...p, active: !p.active } : p))
   }
@@ -68,75 +113,82 @@ export default function PlayersManager({ players: initialPlayers }: { players: P
   const archived = players.filter(p => !p.active)
 
   return (
-    <div className="space-y-6">
-      {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
+    <div>
+      {error && (
+        <div style={{ background: 'rgba(214,96,88,0.15)', border: '1px solid rgba(214,96,88,0.4)', borderRadius: 2, padding: '10px 14px', marginBottom: 16, color: 'var(--loss)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+          {error}
+        </div>
+      )}
 
       {/* Add player */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">Add New Player</CardTitle></CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <Label>Name</Label>
-              <Input value={newName} onChange={e => setNewName(e.target.value)} placeholder="Full name" />
-            </div>
-            <div className="space-y-1">
-              <Label>Nickname (optional)</Label>
-              <Input value={newNickname} onChange={e => setNewNickname(e.target.value)} placeholder="e.g. The Shark" />
-            </div>
+      <div style={card}>
+        <div className="font-mono uppercase mb-4" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>Add New Player</div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label style={labelStyle}>Name</label>
+            <input style={fieldStyle} value={newName} onChange={e => setNewName(e.target.value)} placeholder="Full name" />
           </div>
-          <Button onClick={addPlayer} style={{ backgroundColor: '#16a34a' }} disabled={adding || !newName.trim()}>
-            {adding ? 'Adding…' : 'Add Player'}
-          </Button>
-        </CardContent>
-      </Card>
+          <div>
+            <label style={labelStyle}>Nickname (optional)</label>
+            <input style={fieldStyle} value={newNickname} onChange={e => setNewNickname(e.target.value)} placeholder="e.g. The Shark" />
+          </div>
+        </div>
+        <button style={btnPrimary} onClick={addPlayer} disabled={adding || !newName.trim()}>
+          {adding ? 'Adding…' : 'Add Player'}
+        </button>
+      </div>
 
       {/* Active players */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">Active Players ({active.length})</CardTitle></CardHeader>
-        <CardContent className="space-y-2 pb-4">
-          {active.length === 0 && <p className="text-sm text-gray-500">No active players.</p>}
+      <div style={card}>
+        <div className="font-mono uppercase mb-4" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>
+          Active Players ({active.length})
+        </div>
+        {active.length === 0 && (
+          <p className="font-fraunces italic" style={{ color: 'var(--ivory-dim)', fontSize: 14 }}>No active players.</p>
+        )}
+        <div className="space-y-3">
           {active.map(player => (
-            <div key={player.id} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+            <div key={player.id} className="flex items-center gap-3 py-2" style={{ borderBottom: '1px solid rgba(138,115,64,0.15)' }}>
               {editingId === player.id ? (
                 <>
-                  <Input value={editName} onChange={e => setEditName(e.target.value)} className="h-8 text-sm flex-1" />
-                  <Input value={editNickname} onChange={e => setEditNickname(e.target.value)} placeholder="Nickname" className="h-8 text-sm w-32" />
-                  <Button size="sm" className="h-8 text-xs" style={{ backgroundColor: '#16a34a' }} onClick={() => saveEdit(player.id)}>Save</Button>
-                  <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setEditingId(null)}>Cancel</Button>
+                  <input value={editName} onChange={e => setEditName(e.target.value)} style={{ ...fieldStyle, flex: 1 }} />
+                  <input value={editNickname} onChange={e => setEditNickname(e.target.value)} placeholder="Nickname" style={{ ...fieldStyle, width: 140 }} />
+                  <button style={btnPrimary} onClick={() => saveEdit(player.id)}>Save</button>
+                  <button style={btnOutline} onClick={() => setEditingId(null)}>Cancel</button>
                 </>
               ) : (
                 <>
-                  <div className="flex-1">
-                    <span className="font-medium text-gray-900">{player.name}</span>
-                    {player.nickname && <span className="ml-2 text-xs text-gray-400">"{player.nickname}"</span>}
+                  <div style={{ flex: 1 }}>
+                    <span className="font-fraunces text-ivory" style={{ fontSize: 16 }}>{player.name}</span>
+                    {player.nickname && <span className="font-fraunces italic ml-2" style={{ fontSize: 12, color: 'var(--brass)' }}>"{player.nickname}"</span>}
                   </div>
-                  <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => startEdit(player)}>Edit</Button>
-                  <Button size="sm" variant="outline" className="h-7 text-xs text-gray-500" onClick={() => toggleActive(player)}>Archive</Button>
+                  <button style={btnOutline} onClick={() => startEdit(player)}>Edit</button>
+                  <button style={{ ...btnOutline, color: 'var(--ivory-dim)' }} onClick={() => toggleActive(player)}>Archive</button>
                 </>
               )}
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Archived players */}
+      {/* Archived */}
       {archived.length > 0 && (
-        <Card>
-          <CardHeader><CardTitle className="text-base text-gray-500">Archived ({archived.length})</CardTitle></CardHeader>
-          <CardContent className="space-y-2 pb-4">
+        <div style={card}>
+          <div className="font-mono uppercase mb-4" style={{ fontSize: 10, color: 'var(--ivory-dim)', letterSpacing: '0.2em' }}>
+            Archived ({archived.length})
+          </div>
+          <div className="space-y-3">
             {archived.map(player => (
-              <div key={player.id} className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
-                <div className="flex-1">
-                  <span className="text-gray-500">{player.name}</span>
-                  {player.nickname && <span className="ml-2 text-xs text-gray-400">"{player.nickname}"</span>}
-                  <Badge variant="outline" className="ml-2 text-xs text-gray-400">Archived</Badge>
+              <div key={player.id} className="flex items-center gap-3 py-2" style={{ borderBottom: '1px solid rgba(138,115,64,0.1)' }}>
+                <div style={{ flex: 1 }}>
+                  <span className="font-fraunces" style={{ fontSize: 16, color: 'var(--ivory-dim)' }}>{player.name}</span>
+                  {player.nickname && <span className="font-fraunces italic ml-2" style={{ fontSize: 12, color: 'var(--brass-dim)' }}>"{player.nickname}"</span>}
                 </div>
-                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => toggleActive(player)}>Unarchive</Button>
+                <button style={btnOutline} onClick={() => toggleActive(player)}>Unarchive</button>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   )

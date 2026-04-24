@@ -3,35 +3,50 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { formatPeso } from '@/lib/format'
 
 interface Player { id: string; name: string; nickname: string | null }
-interface SessionPlayer {
-  id: string; player_id: string; total_buyin: number; cashout: number | null; player: Player
-}
+interface SessionPlayer { id: string; player_id: string; total_buyin: number; cashout: number | null; player: Player }
 interface Session { id: string; name: string; date: string; notes: string | null }
 
-function fmt(n: number) {
-  return n.toLocaleString('en-PH', { maximumFractionDigits: 0 })
+const fieldStyle = {
+  width: '100%',
+  background: 'rgba(0,0,0,0.35)',
+  border: '1px solid rgba(138,115,64,0.5)',
+  borderRadius: 2,
+  padding: '9px 12px',
+  color: 'var(--ivory)',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 13,
+  outline: 'none',
+  textAlign: 'right' as const,
 }
 
-function parseAmt(s: string): number {
-  return parseInt(s.replace(/,/g, ''), 10) || 0
+const labelStyle = {
+  display: 'block',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 10,
+  color: 'var(--brass)',
+  letterSpacing: '0.15em',
+  textTransform: 'uppercase' as const,
+  marginBottom: 6,
 }
+
+const card = {
+  background: 'rgba(0,0,0,0.25)',
+  border: '1px solid rgba(138,115,64,0.6)',
+  borderRadius: 4,
+  padding: '24px 28px',
+  marginBottom: 20,
+}
+
+function fmt(n: number) { return n.toLocaleString('en-PH', { maximumFractionDigits: 0 }) }
+function parseAmt(s: string): number { return parseInt(s.replace(/,/g, ''), 10) || 0 }
 
 export default function SessionEditForm({
-  session,
-  players,
-  sessionPlayers: initialSPs,
+  session, players, sessionPlayers: initialSPs,
 }: {
-  session: Session
-  players: Player[]
-  sessionPlayers: SessionPlayer[]
+  session: Session; players: Player[]; sessionPlayers: SessionPlayer[]
 }) {
   const router = useRouter()
   const supabase = createClient()
@@ -47,8 +62,8 @@ export default function SessionEditForm({
   const [success, setSuccess] = useState(false)
   const [addPlayerId, setAddPlayerId] = useState('')
 
-  const existingPlayerIds = new Set(sps.map(sp => sp.player_id))
-  const availablePlayers = players.filter(p => !existingPlayerIds.has(p.id))
+  const existingIds = new Set(sps.map(sp => sp.player_id))
+  const availablePlayers = players.filter(p => !existingIds.has(p.id))
 
   const totalBuyin = sps.reduce((s, sp) => s + sp.total_buyin, 0)
   const totalCashout = sps.reduce((s, sp) => s + (sp.cashout ?? 0), 0)
@@ -73,8 +88,7 @@ export default function SessionEditForm({
     const { data, error } = await supabase
       .from('session_players')
       .insert({ session_id: session.id, player_id: addPlayerId, total_buyin: 0, cashout: 0 })
-      .select('*, player:players(*)')
-      .single()
+      .select('*, player:players(*)').single()
     if (error) { setError(error.message); return }
     setSps(prev => [...prev, data as SessionPlayer])
     setAddPlayerId('')
@@ -89,20 +103,15 @@ export default function SessionEditForm({
   async function handleSave() {
     setSaving(true); setError(''); setSuccess(false)
     const { error: sessionError } = await supabase
-      .from('sessions')
-      .update({ name, date, notes: notes.trim() || null })
-      .eq('id', session.id)
+      .from('sessions').update({ name, date, notes: notes.trim() || null }).eq('id', session.id)
     if (sessionError) { setError(sessionError.message); setSaving(false); return }
 
     for (const sp of sps) {
       const { error: spError } = await supabase
-        .from('session_players')
-        .update({ total_buyin: sp.total_buyin, cashout: sp.cashout })
-        .eq('id', sp.id)
+        .from('session_players').update({ total_buyin: sp.total_buyin, cashout: sp.cashout }).eq('id', sp.id)
       if (spError) { setError(spError.message); setSaving(false); return }
     }
-    setSaving(false)
-    setSuccess(true)
+    setSaving(false); setSuccess(true)
     setTimeout(() => setSuccess(false), 3000)
   }
 
@@ -115,124 +124,147 @@ export default function SessionEditForm({
     router.push('/admin/sessions')
   }
 
-  return (
-    <div className="space-y-6">
-      {error && <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>}
-      {success && <Alert className="border-green-200 bg-green-50 text-green-800"><AlertDescription>Saved successfully.</AlertDescription></Alert>}
+  const selectStyle = {
+    flex: 1,
+    background: 'rgba(0,0,0,0.35)',
+    border: '1px solid rgba(138,115,64,0.5)',
+    borderRadius: 2,
+    padding: '9px 12px',
+    color: 'var(--ivory)',
+    fontFamily: 'var(--font-mono)',
+    fontSize: 13,
+    outline: 'none',
+  }
 
-      {/* Session info */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">Session Details</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-1">
-            <Label>Name</Label>
-            <Input value={name} onChange={e => setName(e.target.value)} />
+  return (
+    <div>
+      {error && (
+        <div style={{ background: 'rgba(214,96,88,0.15)', border: '1px solid rgba(214,96,88,0.4)', borderRadius: 2, padding: '10px 14px', marginBottom: 16, color: 'var(--loss)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+          {error}
+        </div>
+      )}
+      {success && (
+        <div style={{ background: 'rgba(95,184,120,0.15)', border: '1px solid rgba(95,184,120,0.4)', borderRadius: 2, padding: '10px 14px', marginBottom: 16, color: 'var(--win)', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+          Saved successfully.
+        </div>
+      )}
+
+      {/* Session details */}
+      <div style={card}>
+        <div className="font-mono uppercase mb-4" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>Session Details</div>
+        <div className="space-y-4">
+          <div>
+            <label style={labelStyle}>Name</label>
+            <input style={{ ...fieldStyle, textAlign: 'left' }} value={name} onChange={e => setName(e.target.value)} />
           </div>
-          <div className="space-y-1">
-            <Label>Date</Label>
-            <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
+          <div>
+            <label style={labelStyle}>Date</label>
+            <input type="date" style={{ ...fieldStyle, textAlign: 'left' }} value={date} onChange={e => setDate(e.target.value)} />
           </div>
-          <div className="space-y-1">
-            <Label>Notes</Label>
-            <textarea
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              rows={3}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-            />
+          <div>
+            <label style={labelStyle}>Notes</label>
+            <textarea style={{ ...fieldStyle, textAlign: 'left', resize: 'none' }} value={notes} onChange={e => setNotes(e.target.value)} rows={3} />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Balance indicator */}
-      <div className={`rounded-xl px-5 py-3 flex items-center gap-4 ${isBalanced ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-        <span className={`font-bold ${isBalanced ? 'text-green-600' : 'text-red-600'}`}>
+      <div style={{
+        borderRadius: 4, padding: '14px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 16,
+        background: isBalanced ? 'rgba(95,184,120,0.1)' : 'rgba(214,96,88,0.1)',
+        border: `1px solid ${isBalanced ? 'rgba(95,184,120,0.4)' : 'rgba(214,96,88,0.4)'}`,
+      }}>
+        <span className="font-fraunces" style={{ fontSize: 18, color: isBalanced ? 'var(--win)' : 'var(--loss)', fontWeight: 400 }}>
           {isBalanced ? '✓ Balanced' : '✗ Unbalanced'}
         </span>
-        <span className="text-sm text-gray-600">Pot: {formatPeso(totalBuyin)} · Cash-out: {formatPeso(totalCashout)}</span>
+        <span className="font-mono" style={{ fontSize: 12, color: 'var(--ivory-dim)' }}>
+          Pot: {formatPeso(totalBuyin)} · Cash-out: {formatPeso(totalCashout)}
+        </span>
         {!isBalanced && (
-          <span className={`text-sm font-medium ${variance > 0 ? 'text-green-600' : 'text-red-600'}`}>
-            Variance: {variance > 0 ? '+' : '−'}₱{fmt(Math.abs(variance))}
+          <span className="font-mono" style={{ fontSize: 12, color: 'var(--loss)' }}>
+            Off by ₱{Math.abs(variance).toLocaleString()}
           </span>
         )}
       </div>
 
-      {/* Player rows */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">Players</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
+      {/* Players */}
+      <div style={card}>
+        <div className="font-mono uppercase mb-4" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>Players</div>
+        <div className="space-y-4">
           {sps.map(sp => (
-            <div key={sp.id} className="border border-gray-100 rounded-lg p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-900">{sp.player?.name ?? '—'}</span>
-                <button onClick={() => removePlayer(sp.id)} className="text-xs text-red-500 hover:underline">Remove</button>
+            <div key={sp.id} style={{ border: '1px solid rgba(138,115,64,0.2)', borderRadius: 4, padding: '16px' }}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-fraunces text-ivory" style={{ fontSize: 16 }}>{sp.player?.name ?? '—'}</span>
+                <button
+                  onClick={() => removePlayer(sp.id)}
+                  style={{ background: 'none', border: 'none', color: 'var(--loss)', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', cursor: 'pointer', textTransform: 'uppercase' }}
+                >
+                  Remove
+                </button>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Total Buy-in</Label>
-                  <Input
-                    value={fmt(sp.total_buyin)}
-                    onChange={e => updateSp(sp.id, 'total_buyin', e.target.value)}
-                    className="text-right"
-                  />
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label style={labelStyle}>Total Buy-in</label>
+                  <input style={fieldStyle} value={fmt(sp.total_buyin)} onChange={e => updateSp(sp.id, 'total_buyin', e.target.value)} />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Cash-out</Label>
-                  <Input
-                    value={sp.cashout != null ? fmt(sp.cashout) : ''}
-                    onChange={e => updateSp(sp.id, 'cashout', e.target.value)}
-                    placeholder="—"
-                    className="text-right"
-                  />
+                <div>
+                  <label style={labelStyle}>Cash-out</label>
+                  <input style={fieldStyle} value={sp.cashout != null ? fmt(sp.cashout) : ''} onChange={e => updateSp(sp.id, 'cashout', e.target.value)} placeholder="0" />
                 </div>
               </div>
-              {/* Rebuy */}
-              <div className="flex gap-2 items-center">
-                <Input
+              <div className="flex gap-2">
+                <input
+                  style={{ ...fieldStyle, flex: 1, fontSize: 12 }}
                   value={rebuyAmounts[sp.id] ?? ''}
                   onChange={e => setRebuyAmounts(prev => ({ ...prev, [sp.id]: e.target.value }))}
                   placeholder="Rebuy amount"
-                  className="text-right text-sm h-8"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => applyRebuy(sp.id)}
-                  className="whitespace-nowrap h-8 text-xs"
+                  style={{ background: 'transparent', border: '1px solid rgba(138,115,64,0.5)', borderRadius: 2, padding: '7px 14px', color: 'var(--brass)', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: 'pointer', whiteSpace: 'nowrap' }}
                 >
                   + Rebuy
-                </Button>
+                </button>
               </div>
             </div>
           ))}
 
-          {/* Add player */}
           {availablePlayers.length > 0 && (
             <div className="flex gap-2 pt-2">
-              <select
-                value={addPlayerId}
-                onChange={e => setAddPlayerId(e.target.value)}
-                className="flex-1 text-sm border border-input rounded-md px-3 py-2 bg-background focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
+              <select value={addPlayerId} onChange={e => setAddPlayerId(e.target.value)} style={selectStyle}>
                 <option value="">Add player…</option>
                 {availablePlayers.map(p => (
                   <option key={p.id} value={p.id}>{p.name}{p.nickname ? ` (${p.nickname})` : ''}</option>
                 ))}
               </select>
-              <Button variant="outline" onClick={addPlayer} disabled={!addPlayerId}>Add</Button>
+              <button
+                onClick={addPlayer}
+                disabled={!addPlayerId}
+                style={{ background: 'var(--brass)', color: 'var(--ink)', border: 'none', borderRadius: 2, padding: '9px 16px', fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', cursor: addPlayerId ? 'pointer' : 'not-allowed', opacity: addPlayerId ? 1 : 0.5 }}
+              >
+                Add
+              </button>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between">
-        <Button onClick={handleSave} style={{ backgroundColor: '#16a34a' }} disabled={saving}>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{ background: 'var(--brass)', color: 'var(--ink)', border: 'none', borderRadius: 2, padding: '10px 24px', fontFamily: 'var(--font-mono)', fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+        >
           {saving ? 'Saving…' : 'Save Changes'}
-        </Button>
-        <Button variant="destructive" onClick={handleDelete} disabled={deleting}>
+        </button>
+        <button
+          onClick={handleDelete}
+          disabled={deleting}
+          style={{ background: 'rgba(214,96,88,0.15)', color: 'var(--loss)', border: '1px solid rgba(214,96,88,0.4)', borderRadius: 2, padding: '10px 24px', fontFamily: 'var(--font-mono)', fontSize: 12, letterSpacing: '0.15em', textTransform: 'uppercase', cursor: deleting ? 'not-allowed' : 'pointer' }}
+        >
           {deleting ? 'Deleting…' : 'Delete Session'}
-        </Button>
+        </button>
       </div>
     </div>
   )
