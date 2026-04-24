@@ -1,101 +1,119 @@
-import Image from "next/image";
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
+import { formatDate, formatPeso } from '@/lib/format'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import SessionFilters from '@/components/SessionFilters'
 
-export default function Home() {
+export const revalidate = 0
+
+export default async function SessionsPage({
+  searchParams,
+}: {
+  searchParams: { month?: string; year?: string }
+}) {
+  const supabase = createClient()
+
+  let query = supabase
+    .from('sessions')
+    .select(`*, session_players(total_buyin, cashout, player_id)`)
+    .order('date', { ascending: false })
+
+  if (searchParams.year) {
+    query = query
+      .gte('date', `${searchParams.year}-01-01`)
+      .lte('date', `${searchParams.year}-12-31`)
+  }
+  if (searchParams.month) {
+    const [y, m] = searchParams.month.split('-')
+    const lastDay = new Date(Number(y), Number(m), 0).getDate()
+    query = query
+      .gte('date', `${y}-${m}-01`)
+      .lte('date', `${y}-${m}-${lastDay}`)
+  }
+
+  const { data: sessions } = await query
+
+  const enriched = (sessions ?? []).map((s: any) => {
+    const sps = s.session_players ?? []
+    const total_buyin = sps.reduce((sum: number, sp: any) => sum + (sp.total_buyin ?? 0), 0)
+    const total_cashout = sps.reduce((sum: number, sp: any) => sum + (sp.cashout ?? 0), 0)
+    const is_balanced = total_buyin === total_cashout
+    return { ...s, total_buyin, total_cashout, is_balanced, player_count: sps.length }
+  })
+
+  // Stats from all sessions (unfiltered)
+  const { data: allSessions } = await supabase
+    .from('sessions')
+    .select(`session_players(total_buyin, player_id)`)
+
+  const totalSessions = (allSessions ?? []).length
+  const totalVolume = (allSessions ?? []).reduce((sum: number, s: any) =>
+    sum + (s.session_players ?? []).reduce((s2: number, sp: any) => s2 + (sp.total_buyin ?? 0), 0), 0)
+  const uniquePlayers = new Set(
+    (allSessions ?? []).flatMap((s: any) => (s.session_players ?? []).map((sp: any) => sp.player_id))
+  ).size
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="pt-14 md:pt-0">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900">Sessions</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Sessions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-gray-900">{totalSessions}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs text-gray-500 font-medium uppercase tracking-wide">All-Time Volume</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-gray-900">{formatPeso(totalVolume)}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="pb-1">
+            <CardTitle className="text-xs text-gray-500 font-medium uppercase tracking-wide">Active Members</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-gray-900">{uniquePlayers}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <SessionFilters />
+
+      <div className="space-y-3 mt-4">
+        {enriched.map(session => (
+          <Link key={session.id} href={`/sessions/${session.id}`}>
+            <Card className="hover:shadow-md transition-shadow cursor-pointer">
+              <CardContent className="flex items-center justify-between py-4 px-6">
+                <div className="flex flex-col gap-1">
+                  <span className="font-semibold text-gray-900">{session.name}</span>
+                  <span className="text-sm text-gray-500">{formatDate(session.date)}</span>
+                  <span className="text-sm text-gray-400">{session.player_count} players</span>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <span className="font-medium text-gray-700">{formatPeso(session.total_buyin)}</span>
+                  {session.is_balanced ? (
+                    <Badge className="bg-green-100 text-green-700 border-green-200">Balanced ✓</Badge>
+                  ) : (
+                    <Badge variant="destructive">Unbalanced</Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+
+        {enriched.length === 0 && (
+          <p className="text-center text-gray-500 py-16">No sessions found.</p>
+        )}
+      </div>
     </div>
-  );
+  )
 }
