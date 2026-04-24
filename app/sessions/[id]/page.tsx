@@ -1,9 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
-import { formatDate, formatPeso, formatPnl, pnlClass } from '@/lib/format'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Button } from '@/components/ui/button'
+import { formatDate, formatPeso, formatPnl, pnlColor } from '@/lib/format'
+import PageHeader from '@/components/felt/PageHeader'
+import StatTile from '@/components/felt/StatTile'
+import BrassDivider from '@/components/felt/BrassDivider'
+import ScoresheetRow from '@/components/felt/ScoresheetRow'
 import Link from 'next/link'
 
 export const revalidate = 0
@@ -28,92 +29,109 @@ export default async function SessionDetailPage({ params }: { params: { id: stri
     .map((sp: any) => ({ ...sp, net: sp.net ?? ((sp.cashout ?? 0) - sp.total_buyin) }))
     .sort((a: any, b: any) => b.net - a.net)
 
+  const maxAbsNet = Math.max(...rows.map((r: any) => Math.abs(r.net)), 1)
+
+  // Find session number (rank by date)
+  const { count } = await supabase
+    .from('sessions')
+    .select('id', { count: 'exact', head: true })
+    .lte('date', session.date)
+
   return (
-    <div className="pt-14 md:pt-0 max-w-3xl">
-      <div className="mb-2 flex items-center justify-between">
-        <Link href="/" className="text-sm text-green-700 hover:underline">← Sessions</Link>
-        {user && (
-          <Link href={`/admin/sessions/${session.id}/edit`}>
-            <Button variant="outline" size="sm">Edit Session</Button>
+    <div className="max-w-4xl">
+      <div className="mb-4">
+        <Link href="/sessions" className="font-mono uppercase" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.15em' }}>
+          ← The Book
+        </Link>
+      </div>
+
+      <PageHeader
+        eyebrow={`Session № ${String(count ?? 1).padStart(2, '0')}`}
+        title={formatDate(session.date)}
+        subtitle={session.name + (session.notes ? ` · ${session.notes}` : '')}
+        right={user ? (
+          <Link
+            href={`/admin/sessions/${session.id}/edit`}
+            className="font-mono uppercase transition-colors"
+            style={{ fontSize: 11, letterSpacing: '0.15em', border: '1px solid rgba(201,169,97,0.6)', color: 'var(--brass)', padding: '7px 14px', borderRadius: 2 }}
+          >
+            Edit
           </Link>
-        )}
+        ) : undefined}
+      />
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatTile label="Players" value={String(rows.length)} />
+        <StatTile label="Pot Total" value={formatPeso(total_buyin)} />
+        <StatTile label="Cash-Out Total" value={formatPeso(total_cashout)} />
+        <StatTile
+          label="Balance"
+          value={is_balanced ? 'Settled' : `Off by ${formatPeso(Math.abs(variance))}`}
+          accent={is_balanced ? 'var(--win)' : 'var(--loss)'}
+        />
       </div>
 
-      <h1 className="text-2xl font-bold mb-1 text-gray-900">{session.name}</h1>
-      <p className="text-gray-500 mb-2">{formatDate(session.date)}</p>
-      {session.notes && <p className="text-sm text-gray-500 mb-6">{session.notes}</p>}
+      <BrassDivider my={20} />
 
-      {/* Balance indicator */}
-      <div className={`rounded-xl px-6 py-4 mb-8 flex items-center gap-4 ${is_balanced ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-        <span className={`text-xl font-bold ${is_balanced ? 'text-green-600' : 'text-red-600'}`}>
-          {is_balanced ? '✓ Balanced' : '✗ Unbalanced'}
-        </span>
-        {!is_balanced && (
-          <span className="text-red-600 text-sm">
-            Variance: {formatPnl(variance)}
-          </span>
-        )}
+      {/* Scoresheet */}
+      <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(138,115,64,0.6)', borderRadius: 4, overflow: 'hidden' }}>
+        {/* Header */}
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(138,115,64,0.4)' }}>
+          <div className="font-mono uppercase mb-1" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>
+            Buy-in · Cash-out · Net
+          </div>
+          <div className="font-fraunces text-ivory" style={{ fontSize: 24 }}>The Scoresheet</div>
+        </div>
+
+        {/* Column headers */}
+        <div
+          className="grid font-mono uppercase"
+          style={{
+            gridTemplateColumns: '32px 130px 1fr 1fr 100px 80px',
+            gap: 16,
+            padding: '10px 24px',
+            fontSize: 10,
+            color: 'var(--brass)',
+            letterSpacing: '0.15em',
+            borderBottom: '1px solid rgba(138,115,64,0.3)',
+          }}
+        >
+          <div>#</div><div>Player</div><div>Buy-in</div><div>Cash-out</div><div>Bar</div><div className="text-right">Net</div>
+        </div>
+
+        {rows.map((sp: any, i: number) => (
+          <ScoresheetRow
+            key={sp.id}
+            rank={i + 1}
+            playerId={sp.player_id}
+            playerName={sp.player?.name ?? '—'}
+            totalBuyin={sp.total_buyin}
+            cashout={sp.cashout ?? 0}
+            net={sp.net}
+            maxAbsNet={maxAbsNet}
+          />
+        ))}
+
+        {/* Total row */}
+        <div
+          className="grid items-center"
+          style={{
+            gridTemplateColumns: '32px 130px 1fr 1fr 100px 80px',
+            gap: 16,
+            padding: '18px 24px',
+            borderTop: '1px solid var(--brass)',
+            background: 'rgba(201,169,97,0.05)',
+          }}
+        >
+          <div />
+          <div className="font-fraunces italic text-ivory-dim" style={{ fontSize: 14 }}>Totals</div>
+          <div className="font-mono" style={{ fontSize: 13, color: 'var(--ivory-dim)' }}>{formatPeso(total_buyin)}</div>
+          <div className="font-mono" style={{ fontSize: 13, color: 'var(--ivory)' }}>{formatPeso(total_cashout)}</div>
+          <div />
+          <div className="font-fraunces text-right" style={{ fontSize: 18, color: pnlColor(variance) }}>{formatPnl(variance)}</div>
+        </div>
       </div>
-
-      {/* Summary */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs text-gray-500 uppercase tracking-wide">Total Pot</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-bold text-gray-900">{formatPeso(total_buyin)}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-xs text-gray-500 uppercase tracking-wide">Total Cash-out</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-bold text-gray-900">{formatPeso(total_cashout)}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Player results */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Player Results</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Player</TableHead>
-                <TableHead className="text-right">Bought In</TableHead>
-                <TableHead className="text-right">Cashed Out</TableHead>
-                <TableHead className="text-right">Net P&L</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((sp: any) => (
-                <TableRow key={sp.id}>
-                  <TableCell>
-                    <Link href={`/players/${sp.player_id}`} className="font-medium text-green-700 hover:underline">
-                      {sp.player?.name ?? '—'}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-right">{formatPeso(sp.total_buyin)}</TableCell>
-                  <TableCell className="text-right">{sp.cashout != null ? formatPeso(sp.cashout) : '—'}</TableCell>
-                  <TableCell className={`text-right ${pnlClass(sp.net)}`}>{formatPnl(sp.net)}</TableCell>
-                </TableRow>
-              ))}
-              {/* Total row */}
-              <TableRow className="border-t-2 border-gray-200 font-semibold bg-gray-50">
-                <TableCell>Total</TableCell>
-                <TableCell className="text-right">{formatPeso(total_buyin)}</TableCell>
-                <TableCell className="text-right">{formatPeso(total_cashout)}</TableCell>
-                <TableCell className={`text-right ${pnlClass(variance)}`}>{formatPnl(variance)}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
     </div>
   )
 }
