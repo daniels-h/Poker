@@ -48,7 +48,7 @@ export default function NewSessionForm({ players }: { players: Player[] }) {
         session_id: session.id,
         player_id,
         total_buyin: 0,
-        cashout: null,
+        cashout: 0,
       }))
       const { error: spError } = await supabase.from('session_players').insert(rows)
       if (spError) { setError(spError.message); setLoading(false); return }

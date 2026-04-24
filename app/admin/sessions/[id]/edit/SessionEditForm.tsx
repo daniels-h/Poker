@@ -72,7 +72,7 @@ export default function SessionEditForm({
     if (!player) return
     const { data, error } = await supabase
       .from('session_players')
-      .insert({ session_id: session.id, player_id: addPlayerId, total_buyin: 0, cashout: null })
+      .insert({ session_id: session.id, player_id: addPlayerId, total_buyin: 0, cashout: 0 })
       .select('*, player:players(*)')
       .single()
     if (error) { setError(error.message); return }
