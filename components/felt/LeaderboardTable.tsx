@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { formatPnl } from '@/lib/format'
 import StreakPill from './StreakPill'

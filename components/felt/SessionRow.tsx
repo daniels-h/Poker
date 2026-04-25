@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import StatusPill from './StatusPill'
 import { formatPeso, formatDate } from '@/lib/format'
