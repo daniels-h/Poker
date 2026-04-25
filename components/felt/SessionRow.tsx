@@ -17,43 +17,44 @@ interface Props {
 
 export default function SessionRow({ index, id, name, date, notes, playerCount, totalBuyin, isBalanced, hero, villain }: Props) {
   return (
-    <Link href={`/sessions/${id}`} className="block transition-colors" style={{ transitionDuration: '180ms' }}>
+    <Link href={`/sessions/${id}`} className="block transition-colors duration-100">
       <div
-        className="grid gap-6 items-center hover:bg-white/[0.02]"
+        className="grid items-center"
         style={{
-          gridTemplateColumns: '60px 1fr 1fr 1fr auto',
-          padding: '20px 28px',
-          borderLeft: '3px solid #c9a961',
-          borderBottom: '1px solid rgba(138,115,64,0.4)',
-          gap: 24,
+          gridTemplateColumns: '52px 1fr 140px 180px auto',
+          padding: '18px 24px',
+          borderBottom: '1px solid rgba(201,169,97,0.1)',
+          gap: 20,
         }}
+        onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(201,169,97,0.03)' }}
+        onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
       >
         {/* Index */}
         <div
-          className="font-fraunces italic"
-          style={{ fontSize: 42, color: 'var(--brass)', lineHeight: 1, fontWeight: 400 }}
+          className="font-fraunces"
+          style={{ fontSize: 22, color: 'var(--brass-dim)', lineHeight: 1, fontWeight: 600, opacity: 0.6 }}
         >
           {String(index).padStart(2, '0')}
         </div>
 
         {/* Date & meta */}
         <div>
-          <div className="font-fraunces text-ivory" style={{ fontSize: 18 }}>{formatDate(date)}</div>
-          <div className="font-fraunces italic mt-1" style={{ fontSize: 12, color: 'var(--ivory-dim)' }}>
+          <div className="font-fraunces text-ivory" style={{ fontSize: 16, fontWeight: 500 }}>{formatDate(date)}</div>
+          <div className="font-inter mt-0.5" style={{ fontSize: 11.5, color: 'var(--ivory-dim)' }}>
             {name}{notes ? ` · ${notes}` : ''} · {playerCount} players
           </div>
         </div>
 
         {/* Pot */}
         <div>
-          <div className="font-mono uppercase mb-1" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.15em' }}>Pot Total</div>
-          <div className="font-fraunces text-ivory" style={{ fontSize: 22 }}>{formatPeso(totalBuyin)}</div>
+          <div className="label-caps mb-1">Pot</div>
+          <div className="font-mono text-ivory" style={{ fontSize: 15, fontWeight: 500 }}>{formatPeso(totalBuyin)}</div>
         </div>
 
         {/* Hero / Villain */}
         <div>
-          <div className="font-mono uppercase mb-1" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.15em' }}>Hero · Villain</div>
-          <div className="font-inter" style={{ fontSize: 14 }}>
+          <div className="label-caps mb-1">Hero · Villain</div>
+          <div className="font-inter" style={{ fontSize: 13 }}>
             {hero ? <span style={{ color: 'var(--win)' }}>{hero}</span> : <span style={{ color: 'var(--ivory-dim)' }}>—</span>}
             <span style={{ color: 'var(--ivory-dim)' }}> vs </span>
             {villain ? <span style={{ color: 'var(--loss)' }}>{villain}</span> : <span style={{ color: 'var(--ivory-dim)' }}>—</span>}

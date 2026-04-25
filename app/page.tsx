@@ -1,7 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import PageHeader from '@/components/felt/PageHeader'
-import StatTile from '@/components/felt/StatTile'
-import BrassDivider from '@/components/felt/BrassDivider'
 import PodiumCard from '@/components/felt/PodiumCard'
 import { formatPeso } from '@/lib/format'
 import { computeStreak, computeHeroVillain } from '@/lib/stats'
@@ -65,72 +62,132 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-5xl">
-      <PageHeader
-        eyebrow="Good evening"
-        title="The Floor"
-        subtitle="Who's up, who's down, who's buying the next round."
-        right={user ? (
+      {/* Page header */}
+      <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
+        <div>
+          <div className="label-caps mb-3">The Floor</div>
+          <h1
+            className="font-fraunces text-ivory"
+            style={{ fontSize: 52, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: 700 }}
+          >
+            The Club
+          </h1>
+          <p
+            className="font-inter mt-2.5"
+            style={{ fontSize: 13.5, color: 'var(--ivory-dim)', lineHeight: 1.5 }}
+          >
+            Who's up, who's down, who's buying the next round.
+          </p>
+        </div>
+        {user && (
           <Link
             href="/admin/sessions/new"
-            className="font-mono uppercase transition-colors"
+            className="font-mono uppercase transition-colors duration-100"
             style={{
-              fontSize: 11,
-              letterSpacing: '0.15em',
+              fontSize: 10,
+              letterSpacing: '0.18em',
               background: 'var(--brass)',
               color: 'var(--ink)',
-              padding: '8px 16px',
-              borderRadius: 2,
+              padding: '9px 18px',
+              fontWeight: 600,
             }}
           >
-            + Log a Session
+            + Log Session
           </Link>
-        ) : undefined}
-      />
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatTile label="Sessions" value={String(totalSessions)} />
-        <StatTile label="All-Time Volume" value={formatPeso(totalVolume)} />
-        <StatTile label="Biggest Pot" value={formatPeso(biggestPot)} />
-        <StatTile label="Active Rail" value={String(activeCount)} />
+        )}
       </div>
 
-      <BrassDivider />
+      {/* Stat rail — ruled columns, no floating cards */}
+      <div
+        className="stat-rail mb-10"
+        style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}
+      >
+        <div className="stat-rail-cell">
+          <div className="label-caps mb-2">Sessions</div>
+          <div className="font-mono" style={{ fontSize: 30, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
+            {totalSessions}
+          </div>
+        </div>
+        <div className="stat-rail-cell">
+          <div className="label-caps mb-2">All-Time Volume</div>
+          <div className="font-mono" style={{ fontSize: 30, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
+            {formatPeso(totalVolume)}
+          </div>
+        </div>
+        <div className="stat-rail-cell">
+          <div className="label-caps mb-2">Biggest Pot</div>
+          <div className="font-mono" style={{ fontSize: 30, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
+            {formatPeso(biggestPot)}
+          </div>
+        </div>
+        <div className="stat-rail-cell">
+          <div className="label-caps mb-2">Active Rail</div>
+          <div className="font-mono" style={{ fontSize: 30, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
+            {activeCount}
+          </div>
+        </div>
+      </div>
 
       {/* Hall of Fame */}
       {top3.length >= 1 && (
-        <>
+        <div className="mb-10">
           <PodiumCard top3={top3} />
-          <BrassDivider />
-        </>
+        </div>
       )}
 
-      {/* Last session recap */}
+      {/* Last session + streaks */}
       {lastSession && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(138,115,64,0.6)', borderRadius: 4, padding: '24px 28px' }}>
-            <div className="font-mono uppercase mb-3" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>Last Session</div>
-            <div className="font-fraunces text-ivory mb-4" style={{ fontSize: 22 }}>{lastSession.name}</div>
-            <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0" style={{ border: '1px solid rgba(201,169,97,0.18)', boxShadow: 'inset 0 1px 0 rgba(201,169,97,0.18)' }}>
+          {/* Last session */}
+          <div
+            style={{
+              padding: '24px 28px',
+              borderRight: '1px solid rgba(201,169,97,0.15)',
+            }}
+          >
+            <div className="label-caps mb-4">Last Session</div>
+            <div
+              className="font-fraunces text-ivory mb-5"
+              style={{ fontSize: 20, fontWeight: 600, letterSpacing: '-0.01em' }}
+            >
+              {lastSession.name}
+            </div>
+            <div style={{ borderTop: '1px solid rgba(201,169,97,0.15)', paddingTop: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div>
-                <div className="font-mono uppercase mb-1" style={{ fontSize: 10, color: 'var(--win)', letterSpacing: '0.15em' }}>Hero</div>
-                <div className="font-fraunces" style={{ fontSize: 18, color: 'var(--win)' }}>{hero ?? '—'}</div>
+                <div className="label-caps mb-1.5" style={{ color: 'var(--win)' }}>Hero</div>
+                <div className="font-fraunces" style={{ fontSize: 17, color: 'var(--win)', fontWeight: 500 }}>
+                  {hero ?? '—'}
+                </div>
               </div>
               <div>
-                <div className="font-mono uppercase mb-1" style={{ fontSize: 10, color: 'var(--loss)', letterSpacing: '0.15em' }}>Villain</div>
-                <div className="font-fraunces" style={{ fontSize: 18, color: 'var(--loss)' }}>{villain ?? '—'}</div>
+                <div className="label-caps mb-1.5" style={{ color: 'var(--loss)' }}>Villain</div>
+                <div className="font-fraunces" style={{ fontSize: 17, color: 'var(--loss)', fontWeight: 500 }}>
+                  {villain ?? '—'}
+                </div>
               </div>
             </div>
           </div>
 
-          <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(138,115,64,0.6)', borderRadius: 4, padding: '24px 28px' }}>
-            <div className="font-mono uppercase mb-3" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>Streaks & Form</div>
-            <div className="space-y-2">
-              {leaderboard.slice(0, 5).map(p => (
-                <div key={p.id} className="flex items-center justify-between">
-                  <div className="font-fraunces text-ivory" style={{ fontSize: 15 }}>{p.name}</div>
-                  <div className="font-mono" style={{ fontSize: 11, color: p.streak.startsWith('W') ? 'var(--win)' : 'var(--loss)' }}>
-                    {p.streak}
+          {/* Streaks */}
+          <div style={{ padding: '24px 28px' }}>
+            <div className="label-caps mb-4">Streaks &amp; Form</div>
+            <div>
+              {leaderboard.slice(0, 5).map((p, i) => (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between"
+                  style={{
+                    paddingTop: i === 0 ? 0 : 10,
+                    paddingBottom: 10,
+                    borderBottom: i < 4 ? '1px solid rgba(201,169,97,0.1)' : 'none',
+                  }}
+                >
+                  <div className="font-fraunces text-ivory" style={{ fontSize: 14 }}>{p.name}</div>
+                  <div
+                    className="font-mono"
+                    style={{ fontSize: 10.5, letterSpacing: '0.1em', color: p.streak.startsWith('W') ? 'var(--win)' : 'var(--loss)' }}
+                  >
+                    [{p.streak}]
                   </div>
                 </div>
               ))}

@@ -5,40 +5,40 @@
 @layer base {
   :root {
     /* Felt palette */
-    --felt: #1a4532;
-    --felt-deep: #0f2a1e;
-    --felt-lit: #236b4c;
-    --wood: #3d2817;
-    --wood-lit: #6b4423;
+    --felt: #162e22;
+    --felt-deep: #0d1f17;
+    --felt-lit: #1e5038;
+    --wood: #1e0e06;
+    --wood-lit: #3a1c0a;
     --brass: #c9a961;
-    --brass-dim: #8a7340;
+    --brass-dim: #7a6535;
     --ivory: #f4ecd8;
-    --ivory-dim: #e0d4b0;
+    --ivory-dim: #c8bb9a;
     --ink: #1a1410;
-    --win: #5fb878;
-    --loss: #d66058;
+    --win: #4dbe6a;
+    --loss: #d45a50;
 
     /* shadcn tokens mapped to felt palette */
-    --background: 156 43% 17%;
+    --background: 156 43% 13%;
     --foreground: 40 60% 90%;
-    --card: 156 43% 12%;
+    --card: 156 43% 10%;
     --card-foreground: 40 60% 90%;
-    --popover: 156 43% 12%;
+    --popover: 156 43% 10%;
     --popover-foreground: 40 60% 90%;
     --primary: 40 50% 58%;
     --primary-foreground: 30 50% 8%;
-    --secondary: 156 43% 20%;
+    --secondary: 156 43% 16%;
     --secondary-foreground: 40 60% 90%;
-    --muted: 156 43% 20%;
-    --muted-foreground: 40 40% 70%;
-    --accent: 156 43% 25%;
+    --muted: 156 43% 16%;
+    --muted-foreground: 40 35% 62%;
+    --accent: 156 43% 20%;
     --accent-foreground: 40 60% 90%;
-    --destructive: 4 62% 60%;
+    --destructive: 4 62% 57%;
     --destructive-foreground: 40 60% 90%;
-    --border: 40 30% 35%;
-    --input: 156 43% 12%;
+    --border: 40 25% 28%;
+    --input: 156 43% 10%;
     --ring: 40 50% 58%;
-    --radius: 0.25rem;
+    --radius: 0.125rem;
   }
 
   * {
@@ -47,13 +47,24 @@
   }
 
   body {
-    background-color: var(--felt);
+    background-color: var(--felt-deep);
     color: var(--ivory);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-inter), 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3 {
+    text-wrap: balance;
+  }
+
+  /* Tabular numbers everywhere they matter */
+  .font-mono,
+  [class*="font-mono"] {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-/* Felt texture helper — apply to page backgrounds */
+/* Felt texture — richer grain */
 .felt-texture {
   position: relative;
 }
@@ -63,10 +74,11 @@
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(circle at 1px 1px, rgba(0,0,0,.15) 1px, transparent 0),
-    radial-gradient(circle at 3px 4px, rgba(255,255,255,.02) 1px, transparent 0);
-  background-size: 6px 6px, 7px 7px;
-  opacity: 0.6;
+    radial-gradient(circle at 1px 1px, rgba(0,0,0,0.18) 1px, transparent 0),
+    radial-gradient(circle at 4px 3px, rgba(255,255,255,0.015) 1px, transparent 0),
+    radial-gradient(circle at 2px 5px, rgba(0,0,0,0.08) 1px, transparent 0);
+  background-size: 5px 5px, 7px 7px, 9px 9px;
+  opacity: 0.7;
   z-index: 0;
 }
 .felt-texture > * {
@@ -74,37 +86,80 @@
   z-index: 1;
 }
 
-/* Felt glow background */
+/* Page background — overhead lamp effect */
 .felt-glow {
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.3) 0%, transparent 50%),
-    var(--felt);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,169,97,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(0,0,0,0.4) 0%, transparent 50%),
+    var(--felt-deep);
 }
 
-/* Focus ring override */
+/* Brass top-rim highlight on panels */
+.brass-rim {
+  box-shadow: inset 0 1px 0 rgba(201,169,97,0.25);
+}
+
+/* Focus ring */
 *:focus-visible {
   outline: 1px solid var(--brass);
   outline-offset: 2px;
 }
 
-/* Admin form elements — force ivory text on dark felt inputs */
+/* Admin form elements */
 input, textarea, select {
-  color: var(--ivory) !important;
-  background-color: rgba(0,0,0,0.3);
+  color: var(--ivory);
+  background-color: rgba(0,0,0,0.35);
 }
 input::placeholder, textarea::placeholder {
-  color: var(--ivory-dim) !important;
-  opacity: 0.6;
+  color: var(--ivory-dim);
+  opacity: 0.5;
 }
 label {
-  color: var(--ivory) !important;
+  color: var(--ivory);
 }
-/* shadcn Card titles and content on felt background */
+
+/* shadcn overrides */
 [class*="CardTitle"], [class*="CardDescription"] {
-  color: var(--ivory) !important;
+  color: var(--ivory);
 }
-/* shadcn Button text */
 button {
   color: inherit;
+}
+
+/* Stat rail — horizontal strip with brass column dividers */
+.stat-rail {
+  display: grid;
+  border: 1px solid rgba(201,169,97,0.18);
+  box-shadow: inset 0 1px 0 rgba(201,169,97,0.2);
+  background: rgba(0,0,0,0.3);
+}
+.stat-rail-cell {
+  padding: 20px 28px;
+  position: relative;
+}
+.stat-rail-cell + .stat-rail-cell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 1px;
+  background: rgba(201,169,97,0.22);
+}
+
+/* Ledger panel — sharp border, brass rim, no radius */
+.ledger-panel {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(201,169,97,0.18);
+  box-shadow: inset 0 1px 0 rgba(201,169,97,0.2);
+}
+
+/* All-caps label style */
+.label-caps {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
 }

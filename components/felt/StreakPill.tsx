@@ -5,15 +5,12 @@ export default function StreakPill({ streak }: { streak: string }) {
     <span
       className="font-mono uppercase"
       style={{
-        fontSize: 11,
+        fontSize: 10.5,
         color,
-        background: isWin ? 'rgba(95,184,120,0.2)' : 'rgba(214,96,88,0.2)',
-        border: `1px solid ${isWin ? 'rgba(95,184,120,0.4)' : 'rgba(214,96,88,0.4)'}`,
-        borderRadius: 2,
-        padding: '2px 7px',
+        letterSpacing: '0.1em',
       }}
     >
-      {streak}
+      [{streak}]
     </span>
   )
 }

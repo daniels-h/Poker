@@ -30,18 +30,18 @@ export default function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
   }
 
   return (
-    <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(138,115,64,0.6)', borderRadius: 4 }}>
+    <div style={{ background: 'rgba(0,0,0,0.22)', border: '1px solid rgba(201,169,97,0.18)', boxShadow: 'inset 0 1px 0 rgba(201,169,97,0.18)' }}>
       {/* Header */}
       <div
         className="grid font-mono uppercase"
         style={{
           gridTemplateColumns: COLS,
           gap: 16,
-          padding: '14px 24px',
-          borderBottom: '1px solid rgba(138,115,64,0.6)',
-          fontSize: 10,
+          padding: '12px 24px',
+          borderBottom: '1px solid rgba(201,169,97,0.3)',
+          fontSize: 9.5,
           color: 'var(--brass)',
-          letterSpacing: '0.15em',
+          letterSpacing: '0.18em',
         }}
       >
         <div>#</div>
@@ -57,25 +57,33 @@ export default function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
       {/* Rows */}
       {rows.map((row, i) => {
         const isTop3 = i < 3
-        const rankColor = isTop3 ? 'var(--brass)' : 'var(--ivory-dim)'
         const netColor = row.totalPnl >= 0 ? 'var(--win)' : 'var(--loss)'
 
         return (
           <div
             key={row.id}
-            className="grid items-center transition-colors"
+            className="grid items-center transition-colors duration-100"
             style={{
               gridTemplateColumns: COLS,
               gap: 16,
-              padding: '18px 24px',
-              borderBottom: i < rows.length - 1 ? '1px solid rgba(138,115,64,0.15)' : 'none',
-              background: isTop3
-                ? 'linear-gradient(90deg, rgba(201,169,97,0.1) 0%, transparent 40%)'
-                : 'transparent',
+              padding: '16px 24px',
+              borderBottom: i < rows.length - 1 ? '1px solid rgba(201,169,97,0.1)' : 'none',
+              position: 'relative',
             }}
+            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(201,169,97,0.04)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent' }}
           >
-            {/* Rank */}
-            <div className="font-fraunces italic" style={{ fontSize: 28, color: rankColor, fontWeight: 400, lineHeight: 1 }}>
+            {/* Rank watermark */}
+            <div
+              className="font-fraunces"
+              style={{
+                fontSize: 18,
+                color: isTop3 ? 'var(--brass)' : 'var(--ivory-dim)',
+                fontWeight: 600,
+                lineHeight: 1,
+                opacity: isTop3 ? 0.9 : 0.4,
+              }}
+            >
               {i + 1}
             </div>
 
@@ -83,29 +91,33 @@ export default function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
             <div className="flex items-center gap-3">
               <div
                 style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
+                  width: 34,
+                  height: 34,
                   background: 'var(--felt-deep)',
-                  border: `1px solid ${isTop3 ? 'var(--brass)' : 'var(--brass-dim)'}`,
+                  border: `1px solid ${isTop3 ? 'rgba(201,169,97,0.6)' : 'rgba(201,169,97,0.2)'}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                 }}
               >
-                <span className="font-fraunces" style={{ fontSize: 16, color: 'var(--brass)', fontWeight: 400 }}>
+                <span className="font-fraunces" style={{ fontSize: 14, color: 'var(--brass)', fontWeight: 600 }}>
                   {initial(row.name)}
                 </span>
               </div>
               <div>
                 <Link href={`/players/${row.id}`}>
-                  <div className="font-fraunces text-ivory hover:text-brass transition-colors" style={{ fontSize: 17 }}>
+                  <div
+                    className="font-fraunces text-ivory transition-colors duration-100"
+                    style={{ fontSize: 15, fontWeight: isTop3 ? 600 : 400 }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.color = 'var(--brass)' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.color = 'var(--ivory)' }}
+                  >
                     {row.name}
                   </div>
                 </Link>
                 {row.nickname && (
-                  <div className="font-fraunces italic" style={{ fontSize: 12, color: 'var(--brass)' }}>
+                  <div className="font-fraunces italic" style={{ fontSize: 11, color: 'var(--brass-dim)' }}>
                     "{row.nickname}"
                   </div>
                 )}
@@ -113,18 +125,18 @@ export default function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
             </div>
 
             {/* Sessions */}
-            <div className="font-mono text-right" style={{ fontSize: 13, color: 'var(--ivory-dim)' }}>{row.sessions}</div>
+            <div className="font-mono text-right" style={{ fontSize: 12.5, color: 'var(--ivory-dim)' }}>{row.sessions}</div>
 
             {/* Win % */}
-            <div className="font-mono text-right" style={{ fontSize: 13, color: 'var(--ivory-dim)' }}>{row.winRate}%</div>
+            <div className="font-mono text-right" style={{ fontSize: 12.5, color: 'var(--ivory-dim)' }}>{row.winRate}%</div>
 
             {/* Best */}
-            <div className="font-mono text-right" style={{ fontSize: 13, color: 'var(--win)' }}>
+            <div className="font-mono text-right" style={{ fontSize: 12.5, color: 'var(--win)' }}>
               {row.bestWin > 0 ? formatPnl(row.bestWin) : '—'}
             </div>
 
             {/* Worst */}
-            <div className="font-mono text-right" style={{ fontSize: 13, color: 'var(--loss)' }}>
+            <div className="font-mono text-right" style={{ fontSize: 12.5, color: 'var(--loss)' }}>
               {row.worstLoss < 0 ? formatPnl(row.worstLoss) : '—'}
             </div>
 
@@ -134,7 +146,7 @@ export default function LeaderboardTable({ rows }: { rows: LeaderboardRow[] }) {
             </div>
 
             {/* Net P&L */}
-            <div className="font-fraunces text-right" style={{ fontSize: 22, color: netColor, fontWeight: 400 }}>
+            <div className="font-mono text-right" style={{ fontSize: 18, color: netColor, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
               {formatPnl(row.totalPnl)}
             </div>
           </div>

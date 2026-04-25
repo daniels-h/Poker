@@ -44,35 +44,35 @@ export default function StatTile({ label, value, sub, accent }: Props) {
     <div
       style={{
         position: 'relative',
-        background: 'rgba(0,0,0,0.25)',
-        border: '1px solid rgba(138,115,64,0.6)',
-        borderRadius: 4,
-        padding: '20px 24px',
+        background: 'rgba(0,0,0,0.28)',
+        border: '1px solid rgba(201,169,97,0.18)',
+        boxShadow: 'inset 0 1px 0 rgba(201,169,97,0.2)',
+        padding: '18px 22px 16px',
       }}
     >
       <CornerMarks />
       <div
-        className="font-mono uppercase mb-2.5"
-        style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.15em' }}
+        className="label-caps mb-3"
       >
         {label}
       </div>
       <div
-        className="font-fraunces"
+        className="font-mono"
         style={{
-          fontSize: 36,
+          fontSize: 32,
           lineHeight: 1,
           letterSpacing: '-0.02em',
           color: accent ?? 'var(--ivory)',
-          fontWeight: 400,
+          fontWeight: 500,
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
         {value}
       </div>
       {sub && (
         <div
-          className="font-fraunces italic mt-2"
-          style={{ fontSize: 12, color: 'var(--ivory-dim)' }}
+          className="font-inter italic mt-2"
+          style={{ fontSize: 11.5, color: 'var(--ivory-dim)' }}
         >
           {sub}
         </div>

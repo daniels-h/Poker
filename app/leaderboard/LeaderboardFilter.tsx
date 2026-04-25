@@ -11,23 +11,24 @@ const filters = [
 export default function LeaderboardFilter({ current }: { current: string }) {
   const router = useRouter()
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-0" style={{ borderBottom: '1px solid rgba(201,169,97,0.2)' }}>
       {filters.map(f => {
         const active = current === f.value
         return (
           <button
             key={f.value}
             onClick={() => router.push(`/leaderboard?period=${f.value}`)}
-            className="font-mono uppercase transition-colors"
+            className="font-mono uppercase transition-colors duration-100"
             style={{
-              fontSize: 11,
-              letterSpacing: '0.15em',
-              padding: '5px 12px',
-              borderRadius: 2,
-              border: '1px solid rgba(138,115,64,0.5)',
-              background: active ? 'var(--brass)' : 'transparent',
-              color: active ? 'var(--ink)' : 'var(--ivory-dim)',
+              fontSize: 10,
+              letterSpacing: '0.18em',
+              padding: '6px 14px',
+              background: 'transparent',
+              color: active ? 'var(--brass)' : 'var(--ivory-dim)',
               cursor: 'pointer',
+              border: 'none',
+              borderBottom: active ? '2px solid var(--brass)' : '2px solid transparent',
+              marginBottom: -1,
             }}
           >
             {f.label}

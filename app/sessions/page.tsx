@@ -1,7 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/felt/PageHeader'
-import StatTile from '@/components/felt/StatTile'
-import BrassDivider from '@/components/felt/BrassDivider'
 import SessionRow from '@/components/felt/SessionRow'
 import { formatPeso } from '@/lib/format'
 import { computeHeroVillain } from '@/lib/stats'
@@ -58,25 +56,42 @@ export default async function SessionsPage({ searchParams }: { searchParams: { y
         right={user ? (
           <Link
             href="/admin/sessions/new"
-            className="font-mono uppercase transition-colors"
-            style={{ fontSize: 11, letterSpacing: '0.15em', background: 'var(--brass)', color: 'var(--ink)', padding: '8px 16px', borderRadius: 2 }}
+            className="font-mono uppercase transition-colors duration-100"
+            style={{ fontSize: 10, letterSpacing: '0.18em', background: 'var(--brass)', color: 'var(--ink)', padding: '9px 18px', fontWeight: 600 }}
           >
-            + Log a Session
+            + Log Session
           </Link>
         ) : undefined}
       />
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <StatTile label="Total Sessions" value={String(totalSessions)} />
-        <StatTile label="All-Time Volume" value={formatPeso(totalVolume)} />
-        <StatTile label="Active Rail" value={String(activeRail)} />
+      {/* Stat rail */}
+      <div
+        className="stat-rail mb-8"
+        style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}
+      >
+        <div className="stat-rail-cell">
+          <div className="label-caps mb-2">Total Sessions</div>
+          <div className="font-mono" style={{ fontSize: 28, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
+            {totalSessions}
+          </div>
+        </div>
+        <div className="stat-rail-cell">
+          <div className="label-caps mb-2">All-Time Volume</div>
+          <div className="font-mono" style={{ fontSize: 28, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
+            {formatPeso(totalVolume)}
+          </div>
+        </div>
+        <div className="stat-rail-cell">
+          <div className="label-caps mb-2">Active Rail</div>
+          <div className="font-mono" style={{ fontSize: 28, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
+            {activeRail}
+          </div>
+        </div>
       </div>
-
-      <BrassDivider my={20} />
 
       <SessionsFilter />
 
-      <div className="mt-4" style={{ border: '1px solid rgba(138,115,64,0.4)', borderRadius: 4, overflow: 'hidden' }}>
+      <div className="mt-5" style={{ border: '1px solid rgba(201,169,97,0.18)', boxShadow: 'inset 0 1px 0 rgba(201,169,97,0.18)', overflow: 'hidden' }}>
         {enriched.length === 0 ? (
           <p className="font-fraunces italic text-center py-16" style={{ color: 'var(--ivory-dim)', fontSize: 16 }}>
             No sessions yet. The books are open.

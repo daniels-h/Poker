@@ -11,18 +11,18 @@ const config: Config = {
     extend: {
       colors: {
         // Felt palette
-        felt: '#1a4532',
-        'felt-deep': '#0f2a1e',
-        'felt-lit': '#236b4c',
-        wood: '#3d2817',
-        'wood-lit': '#6b4423',
+        felt: '#162e22',
+        'felt-deep': '#0d1f17',
+        'felt-lit': '#1e5038',
+        wood: '#1e0e06',
+        'wood-lit': '#3a1c0a',
         brass: '#c9a961',
-        'brass-dim': '#8a7340',
+        'brass-dim': '#7a6535',
         ivory: '#f4ecd8',
-        'ivory-dim': '#e0d4b0',
+        'ivory-dim': '#c8bb9a',
         ink: '#1a1410',
-        win: '#5fb878',
-        loss: '#d66058',
+        win: '#4dbe6a',
+        loss: '#d45a50',
 
         // shadcn tokens
         background: 'hsl(var(--background))',

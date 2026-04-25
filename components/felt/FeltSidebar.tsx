@@ -17,20 +17,25 @@ export default function FeltSidebar() {
     <aside
       className="hidden md:flex flex-col fixed left-0 top-0 h-full w-[220px] z-40"
       style={{
-        background: 'linear-gradient(180deg, #3d2817 0%, #2a1a0e 100%)',
-        borderRight: '1px solid rgba(201,169,97,0.2)',
+        background: 'linear-gradient(180deg, #2a1208 0%, #160904 60%, #0e0603 100%)',
+        borderRight: '1px solid rgba(201,169,97,0.15)',
       }}
     >
       {/* Top brass rule */}
-      <div style={{ height: 2, background: 'linear-gradient(90deg, transparent, #c9a961 50%, transparent)' }} />
+      <div style={{ height: 1, background: 'linear-gradient(90deg, transparent 0%, rgba(201,169,97,0.7) 40%, rgba(201,169,97,0.7) 60%, transparent 100%)' }} />
 
       {/* Header */}
-      <div className="px-6 pt-7 pb-5" style={{ borderBottom: '1px solid rgba(138,115,64,0.4)' }}>
-        <div className="font-fraunces text-ivory" style={{ fontSize: 22, lineHeight: 1.2 }}>The Club</div>
+      <div className="px-6 pt-8 pb-6" style={{ borderBottom: '1px solid rgba(201,169,97,0.12)' }}>
+        <div
+          className="font-fraunces text-ivory"
+          style={{ fontSize: 20, lineHeight: 1.2, letterSpacing: '-0.02em', fontWeight: 600 }}
+        >
+          The Club
+        </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex flex-col gap-1 px-3 pt-5 flex-1">
+      <nav className="flex flex-col gap-0.5 px-3 pt-6 flex-1">
         {navItems.map(item => {
           const active = item.href === '/'
             ? pathname === '/'
@@ -39,18 +44,18 @@ export default function FeltSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 px-3 py-2.5 transition-colors duration-180"
+              className="flex items-center gap-3 px-3 py-2.5 transition-colors duration-100"
               style={{
-                borderLeft: active ? '2px solid #c9a961' : '2px solid transparent',
-                background: active ? 'rgba(201,169,97,0.08)' : 'transparent',
+                borderLeft: active ? '2px solid var(--brass)' : '2px solid transparent',
+                background: 'transparent',
                 color: active ? 'var(--brass)' : 'var(--ivory-dim)',
                 fontFamily: 'var(--font-inter)',
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: active ? 600 : 400,
-                borderRadius: '0 2px 2px 0',
+                letterSpacing: active ? '0.01em' : '0',
               }}
             >
-              <span style={{ fontSize: 12 }}>{item.suit}</span>
+              <span style={{ fontSize: 14, opacity: active ? 1 : 0.6 }}>{item.suit}</span>
               {item.label}
             </Link>
           )
@@ -58,16 +63,14 @@ export default function FeltSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-6 pb-6 pt-4" style={{ borderTop: '1px solid rgba(138,115,64,0.3)' }}>
-        <div className="font-mono uppercase tracking-widest mb-1" style={{ fontSize: 10, color: 'var(--brass)', letterSpacing: '0.2em' }}>
-          Admin
-        </div>
+      <div className="px-6 pb-6 pt-4" style={{ borderTop: '1px solid rgba(201,169,97,0.1)' }}>
+        <div className="label-caps mb-2">Admin</div>
         <Link
           href="/admin"
-          className="font-fraunces italic transition-colors"
-          style={{ fontSize: 13, color: 'var(--ivory-dim)' }}
+          className="font-inter transition-colors"
+          style={{ fontSize: 12, color: 'var(--ivory-dim)', letterSpacing: '0.02em' }}
         >
-          The Floor
+          Manage →
         </Link>
       </div>
     </aside>
