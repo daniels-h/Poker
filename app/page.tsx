@@ -2,17 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { computeStreak } from '@/lib/stats'
 import { formatPnl, formatDate } from '@/lib/format'
 import Link from 'next/link'
-import CountdownClock from '@/components/felt/CountdownClock'
 
 export const revalidate = 0
-
-const GOLD = '#C8A951'
-const CARD_BG = '#122416'
-const CARD_BORDER = 'rgba(200,169,81,0.2)'
-const DARK_BORDER = '#1E3A24'
-const TEXT_PRIMARY = '#F0EDE4'
-const TEXT_MUTED = '#A3B8A8'
-const TEXT_DIM = '#7A9A82'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -23,6 +14,7 @@ export default async function DashboardPage() {
     .order('date', { ascending: false })
 
   const allSessions = sessions ?? []
+
   const totalSessions = allSessions.length
   const totalVolume = allSessions.reduce((sum: number, s: any) =>
     sum + (s.session_players ?? []).reduce((s2: number, sp: any) => s2 + (sp.total_buyin ?? 0), 0), 0)
@@ -51,299 +43,255 @@ export default async function DashboardPage() {
     }))
     .sort((a, b) => b.totalPnl - a.totalPnl)
 
-  const top3 = leaderboard.slice(0, 3)
+  const seasonLeader = leaderboard[0] ?? null
 
   const lastSession = allSessions[0]
   const lastSps = (lastSession?.session_players ?? []) as any[]
   const lastSorted = [...lastSps].sort((a, b) => (b.net ?? 0) - (a.net ?? 0))
-  const totalPot = lastSps.reduce((sum: number, sp: any) => sum + (sp.total_buyin ?? 0), 0)
+  const lastWinner = lastSorted[0]
 
-  const avgSessionsPerPlayer = leaderboard.length > 0
-    ? Math.round(leaderboard.reduce((a, b) => a + b.sessions, 0) / leaderboard.length)
-    : 0
-
-  const nextSessionDateStr = process.env.NEXT_PUBLIC_NEXT_SESSION_DATE ?? null
-
-  const statCards = [
-    { icon: '♠', value: String(totalSessions), label: 'Sessions Played' },
-    { icon: '♣', value: String(activeCount), label: 'Active Players' },
-    { icon: '♦', value: `₱${Math.round(totalVolume / 1000 * 10) / 10}K`, label: 'Total Pot Volume' },
-    { icon: '♥', value: String(avgSessionsPerPlayer), label: 'Avg Sessions / Player' },
-  ]
-
-  const podiumMedals = [
-    { color: '#C0C0C0', label: '2ND', height: 56 },
-    { color: '#C8A951', label: '1ST', height: 80 },
-    { color: '#CD7F32', label: '3RD', height: 40 },
-  ]
-  const podiumOrder = top3.length >= 3
-    ? [top3[1], top3[0], top3[2]]
-    : top3.length === 2
-      ? [top3[1], top3[0]]
-      : top3
+  const nextSession = allSessions.find((s: any) => new Date(s.date) > new Date()) ?? null
 
   return (
     <div className="page-wrap-dark">
       {/* Hero */}
       <div style={{
         position: 'relative', textAlign: 'center',
-        padding: '88px 40px 64px',
+        padding: '100px 40px 60px',
+        background: 'radial-gradient(ellipse at center, #2a4a2a 0%, #1a2e1a 40%, #1a1a18 100%)',
         overflow: 'hidden',
       }}>
+        {/* Felt overlay */}
+        <div style={{
+          position: 'absolute', inset: 0, opacity: 0.08, pointerEvents: 'none',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3Ccircle cx='4' cy='4' r='0.5'/%3E%3C/g%3E%3C/svg%3E")`,
+        }} />
         <div style={{ position: 'relative', zIndex: 1 }}>
           <div style={{
-            fontSize: 16, color: GOLD, letterSpacing: '0.6em',
-            fontFamily: 'Georgia, serif', marginBottom: 24, opacity: 0.5,
+            fontSize: 18, color: '#b8943e', letterSpacing: '0.5em',
+            fontFamily: 'Georgia, serif', marginBottom: 20, opacity: 0.6,
           }}>♠ ♥ ♦ ♣</div>
           <h1 style={{
             fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-            fontSize: 60, fontWeight: 700, color: TEXT_PRIMARY,
+            fontSize: 64, fontWeight: 700, color: '#f5f0e8',
             margin: 0, letterSpacing: '0.02em',
+            textShadow: '0 2px 30px rgba(0,0,0,0.5)',
           }}>
             Poker Open Play
           </h1>
           <p style={{
-            fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-            fontSize: 17, color: GOLD, marginTop: 14, fontStyle: 'italic', letterSpacing: '0.04em',
+            fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+            fontSize: 18, color: '#b8943e', marginTop: 12, fontStyle: 'italic', letterSpacing: '0.05em',
           }}>
             Where the cards fall and legends are made
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, margin: '28px 0 20px' }}>
-            <span style={{ display: 'block', width: 72, height: 1, background: `rgba(200,169,81,0.35)` }} />
-            <span style={{ color: GOLD, fontSize: 14, fontFamily: 'Georgia, serif' }}>♠</span>
-            <span style={{ display: 'block', width: 72, height: 1, background: `rgba(200,169,81,0.35)` }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, margin: '24px 0' }}>
+            <span style={{ display: 'block', width: 80, height: 1, background: 'rgba(184,148,62,0.4)' }} />
+            <span style={{ color: '#b8943e', fontSize: 16, fontFamily: 'Georgia, serif' }}>♠</span>
+            <span style={{ display: 'block', width: 80, height: 1, background: 'rgba(184,148,62,0.4)' }} />
           </div>
           <p style={{
-            fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-            fontSize: 15, color: TEXT_MUTED, maxWidth: 460, margin: '0 auto', lineHeight: 1.75,
+            fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+            fontSize: 16, color: '#a09882', maxWidth: 500, margin: '0 auto', lineHeight: 1.7,
           }}>
             A private club for serious players. Track your sessions, climb the leaderboard, and prove your edge.
           </p>
         </div>
       </div>
 
-      {/* Stat cards */}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px 48px' }}>
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-          {statCards.map(({ icon, value, label }) => (
+      {/* Stats strip */}
+      <div style={{ background: 'rgba(0,0,0,0.3)', padding: '40px 0' }}>
+        <div style={{
+          maxWidth: 1200, margin: '0 auto', padding: '0 40px',
+          display: 'flex', gap: 20, flexWrap: 'wrap',
+        }}>
+          {[
+            { icon: '♠', value: String(totalSessions), label: 'Sessions Played' },
+            { icon: '♣', value: String(activeCount), label: 'Active Players' },
+            { icon: '♦', value: `₱${Math.round(totalVolume / 1000 * 10) / 10}K`, label: 'Total Pot Volume' },
+            { icon: '♥', value: leaderboard.length > 0 ? String(Math.round(leaderboard.reduce((a, b) => a + b.sessions, 0) / Math.max(leaderboard.length, 1))) : '0', label: 'Avg Sessions / Player' },
+          ].map(({ icon, value, label }) => (
             <div key={label} style={{
-              background: CARD_BG, border: `1px solid ${CARD_BORDER}`,
-              borderRadius: 12, padding: '18px 22px',
-              display: 'flex', alignItems: 'center', gap: 16,
-              flex: '1 1 200px',
+              background: 'rgba(26,26,24,0.6)', border: '1px solid rgba(184,148,62,0.3)',
+              borderRadius: 12, padding: '28px 24px', textAlign: 'center',
+              backdropFilter: 'blur(8px)', flex: '1 1 200px',
             }}>
+              <div style={{ fontSize: 28, marginBottom: 8 }}>{icon}</div>
               <div style={{
-                width: 44, height: 44, borderRadius: '50%',
-                background: 'rgba(200,169,81,0.1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20, color: GOLD, flexShrink: 0,
-              }}>
-                {icon}
-              </div>
-              <div>
-                <div style={{
-                  fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                  fontSize: 28, fontWeight: 700, color: GOLD, lineHeight: 1,
-                }}>{value}</div>
-                <div style={{
-                  fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-                  fontSize: 11, color: TEXT_MUTED, marginTop: 5,
-                  textTransform: 'uppercase', letterSpacing: '0.1em',
-                }}>{label}</div>
-              </div>
+                fontSize: 36, fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+                fontWeight: 700, color: '#b8943e', marginBottom: 4,
+              }}>{value}</div>
+              <div style={{
+                fontSize: 13, color: '#a09882',
+                fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                textTransform: 'uppercase', letterSpacing: '0.1em',
+              }}>{label}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Three info panels */}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px 64px' }}>
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-
-          {/* Panel 1: Countdown */}
+      {/* Info cards */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 40px' }}>
+        <div style={{ display: 'flex', gap: 32, flexWrap: 'wrap' }}>
+          {/* Next Session */}
           <div style={{
-            flex: '1 1 280px', background: CARD_BG,
-            border: `1px solid ${CARD_BORDER}`,
-            borderRadius: 12, padding: '28px 28px 32px', overflow: 'hidden',
+            flex: '1 1 300px', background: '#252420', borderRadius: 12,
+            border: '1px solid rgba(184,148,62,0.25)', overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           }}>
             <div style={{
+              background: '#1a1a18', color: '#b8943e', padding: '14px 24px',
               fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-              fontSize: 13, fontWeight: 600, color: GOLD,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              marginBottom: 28,
-            }}>Next Session</div>
-            <CountdownClock targetDateStr={nextSessionDateStr} />
+              fontSize: 15, fontWeight: 600, letterSpacing: '0.05em',
+              textTransform: 'uppercase', borderBottom: '2px solid #b8943e',
+            }}>
+              Next Session
+            </div>
+            <div style={{ padding: '24px' }}>
+              {nextSession ? (
+                <>
+                  <div style={{
+                    fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+                    fontSize: 22, fontWeight: 700, color: '#f5f0e8',
+                  }}>{formatDate(nextSession.date)}</div>
+                  <div style={{
+                    fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                    fontSize: 14, color: '#706b5f', marginTop: 4,
+                  }}>{nextSession.name}</div>
+                </>
+              ) : (
+                <>
+                  <div style={{
+                    fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+                    fontSize: 22, fontWeight: 700, color: '#f5f0e8',
+                  }}>TBD</div>
+                  <div style={{
+                    fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                    fontSize: 14, color: '#706b5f', marginTop: 4,
+                  }}>No upcoming session scheduled</div>
+                </>
+              )}
+              <Link href="/sessions" style={{
+                display: 'inline-block', marginTop: 16,
+                padding: '6px 14px', borderRadius: 20,
+                background: 'rgba(184,148,62,0.12)', color: '#b8943e',
+                fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                fontSize: 13, fontWeight: 600, textDecoration: 'none',
+              }}>
+                View Sessions →
+              </Link>
+            </div>
           </div>
 
-          {/* Panel 2: Last Session */}
+          {/* Last Session */}
           <div style={{
-            flex: '1 1 280px', background: CARD_BG,
-            border: `1px solid ${CARD_BORDER}`,
-            borderRadius: 12, padding: '28px 28px 32px',
+            flex: '1 1 300px', background: '#252420', borderRadius: 12,
+            border: '1px solid rgba(184,148,62,0.25)', overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           }}>
             <div style={{
+              background: '#1a1a18', color: '#b8943e', padding: '14px 24px',
               fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-              fontSize: 13, fontWeight: 600, color: GOLD,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              marginBottom: 24,
-            }}>Last Session</div>
-
-            {lastSession ? (
-              <>
-                <div style={{
-                  fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                  fontSize: 22, fontWeight: 700, color: TEXT_PRIMARY,
-                }}>{formatDate(lastSession.date)}</div>
-                <div style={{
-                  fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-                  fontSize: 13, color: TEXT_DIM, marginTop: 4, marginBottom: 20,
-                }}>{lastSps.length} players · {lastSession.name}</div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {lastSorted.slice(0, 2).map((sp: any, i: number) => (
-                    <div key={sp.player_id} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '10px 14px', borderRadius: 8,
-                      background: i === 0 ? 'rgba(34,197,94,0.08)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${i === 0 ? 'rgba(34,197,94,0.15)' : DARK_BORDER}`,
-                    }}>
-                      <span style={{
-                        fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-                        fontSize: 14, color: TEXT_PRIMARY,
+              fontSize: 15, fontWeight: 600, letterSpacing: '0.05em',
+              textTransform: 'uppercase', borderBottom: '2px solid #b8943e',
+            }}>
+              Last Session
+            </div>
+            <div style={{ padding: '24px' }}>
+              {lastSession ? (
+                <>
+                  <div style={{
+                    fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+                    fontSize: 22, fontWeight: 700, color: '#f5f0e8',
+                  }}>{formatDate(lastSession.date)}</div>
+                  <div style={{
+                    fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                    fontSize: 14, color: '#706b5f', marginTop: 4,
+                  }}>
+                    {lastSps.length} players · {lastSession.name}
+                  </div>
+                  {lastWinner && (
+                    <div style={{ marginTop: 16 }}>
+                      <div style={{
+                        display: 'flex', justifyContent: 'space-between', padding: '8px 0',
+                        borderBottom: '1px solid rgba(255,255,255,0.06)',
+                        fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                        fontSize: 14, color: '#d4cfc2',
                       }}>
-                        {i === 0 ? '🏆 ' : ''}{sp.player?.name ?? '?'}
-                      </span>
-                      <span style={{
-                        fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-                        fontWeight: 700, fontSize: 14,
-                        color: (sp.net ?? 0) >= 0 ? '#22C55E' : '#EF4444',
-                      }}>
-                        {formatPnl(sp.net ?? 0)}
-                      </span>
-                    </div>
-                  ))}
-                  {totalPot > 0 && (
-                    <div style={{
-                      fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-                      fontSize: 13, color: TEXT_DIM, paddingTop: 8,
-                    }}>
-                      Total pot: <span style={{ color: TEXT_MUTED, fontWeight: 600 }}>₱{totalPot.toLocaleString()}</span>
+                        <span>🏆 Top Winner</span>
+                        <span style={{ color: '#4a7c59' }}>
+                          {lastWinner.player?.name} ({formatPnl(lastWinner.net)})
+                        </span>
+                      </div>
                     </div>
                   )}
-                </div>
-              </>
-            ) : (
-              <div style={{
-                fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                fontSize: 18, fontWeight: 600, color: TEXT_DIM, fontStyle: 'italic',
-              }}>No sessions yet</div>
-            )}
-
-            <Link href="/sessions" style={{
-              display: 'inline-block', marginTop: 20,
-              fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-              fontSize: 13, fontWeight: 600, color: GOLD, textDecoration: 'none',
-              letterSpacing: '0.02em',
-            }}>
-              View all sessions →
-            </Link>
+                </>
+              ) : (
+                <div style={{
+                  fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+                  fontSize: 22, fontWeight: 700, color: '#706b5f', fontStyle: 'italic',
+                }}>No sessions yet</div>
+              )}
+            </div>
           </div>
 
-          {/* Panel 3: Season Leaders podium */}
+          {/* Season Leader */}
           <div style={{
-            flex: '1 1 280px', background: CARD_BG,
-            border: `1px solid ${CARD_BORDER}`,
-            borderRadius: 12, padding: '28px 28px 32px',
+            flex: '1 1 300px', background: '#252420', borderRadius: 12,
+            border: '1px solid rgba(184,148,62,0.25)', overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
           }}>
             <div style={{
+              background: '#1a1a18', color: '#b8943e', padding: '14px 24px',
               fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-              fontSize: 13, fontWeight: 600, color: GOLD,
-              letterSpacing: '0.1em', textTransform: 'uppercase',
-              marginBottom: 24,
-            }}>Season Leaders</div>
-
-            {top3.length > 0 ? (
-              <>
-                {/* Podium */}
-                <div style={{
-                  display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-                  gap: 12, marginBottom: 20,
-                }}>
-                  {podiumOrder.map((player, i) => {
-                    const actualRank = leaderboard.indexOf(player)
-                    const medal = podiumMedals[top3.length >= 3 ? i : (top3.length === 2 ? [0, 1][i] : 1)]
-                    return (
-                      <div key={player.id} style={{ textAlign: 'center', flex: 1 }}>
-                        <div style={{
-                          fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                          fontSize: actualRank === 0 ? 15 : 13,
-                          fontWeight: 700, color: TEXT_PRIMARY,
-                          marginBottom: 4,
-                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                        }}>{player.name}</div>
-                        <div style={{
-                          fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-                          fontSize: 12, color: actualRank === 0 ? '#22C55E' : TEXT_DIM,
-                          marginBottom: 8, fontWeight: actualRank === 0 ? 600 : 400,
-                        }}>{formatPnl(player.totalPnl)}</div>
-                        <div style={{
-                          height: medal.height,
-                          background: actualRank === 0
-                            ? 'linear-gradient(180deg, #C8A951 0%, #9A7830 100%)'
-                            : actualRank === 1
-                              ? 'linear-gradient(180deg, #C0C0C0 0%, #909090 100%)'
-                              : 'linear-gradient(180deg, #CD7F32 0%, #9A5A20 100%)',
-                          borderRadius: '6px 6px 0 0',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontFamily: 'var(--font-playfair), serif',
-                          fontSize: actualRank === 0 ? 24 : 18, fontWeight: 700,
-                          color: '#0B1A0F',
-                        }}>
-                          {actualRank + 1}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-
-                {/* 1st place details */}
-                {top3[0] && (
-                  <div style={{
-                    fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-                    fontSize: 13, color: TEXT_DIM, textAlign: 'center',
-                  }}>
-                    Sessions: <span style={{ color: TEXT_MUTED }}>{top3[0].sessions}</span>
-                    {' · '}
-                    Win Rate: <span style={{ color: TEXT_MUTED }}>{top3[0].winRate}%</span>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div style={{
-                fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                fontSize: 18, fontWeight: 600, color: TEXT_DIM, fontStyle: 'italic',
-              }}>No data yet</div>
-            )}
-
-            <Link href="/leaderboard" style={{
-              display: 'inline-block', marginTop: 20,
-              fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-              fontSize: 13, fontWeight: 600, color: GOLD, textDecoration: 'none',
+              fontSize: 15, fontWeight: 600, letterSpacing: '0.05em',
+              textTransform: 'uppercase', borderBottom: '2px solid #b8943e',
             }}>
-              Full leaderboard →
-            </Link>
+              Season Leader
+            </div>
+            <div style={{ padding: '24px' }}>
+              {seasonLeader ? (
+                <>
+                  <div style={{ fontSize: 48, marginBottom: 8 }}>♠</div>
+                  <div style={{
+                    fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+                    fontSize: 22, fontWeight: 700, color: '#f5f0e8',
+                  }}>{seasonLeader.name}</div>
+                  <div style={{
+                    fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                    fontSize: 14, color: '#706b5f', marginTop: 4,
+                  }}>
+                    {formatPnl(seasonLeader.totalPnl)} · {seasonLeader.winRate}% win rate
+                  </div>
+                  <div style={{
+                    display: 'inline-block', marginTop: 16, padding: '6px 14px', borderRadius: 20,
+                    background: 'rgba(184,148,62,0.15)', color: '#b8943e',
+                    fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                    fontSize: 13, fontWeight: 600,
+                  }}>
+                    {seasonLeader.sessions} sessions
+                  </div>
+                </>
+              ) : (
+                <div style={{
+                  fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+                  fontSize: 22, fontWeight: 700, color: '#706b5f', fontStyle: 'italic',
+                }}>No data yet</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
       <footer style={{
-        borderTop: `1px solid ${DARK_BORDER}`,
-        padding: '28px 40px', textAlign: 'center',
-        fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
-        color: TEXT_DIM, fontSize: 13,
+        background: '#1a1a18', borderTop: '2px solid #b8943e',
+        padding: '32px 40px', textAlign: 'center',
+        fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+        color: '#706b5f', fontSize: 13,
       }}>
-        <span style={{ color: GOLD, marginRight: 8, opacity: 0.6 }}>♠♥♦♣</span>
+        <span style={{ color: '#b8943e', marginRight: 8 }}>♠♥♦♣</span>
         Poker Open Play © 2026 — All rights reserved
       </footer>
     </div>

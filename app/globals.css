@@ -4,58 +4,58 @@
 
 @layer base {
   :root {
-    /* Design tokens */
-    --bg-darkest: #0B1A0F;
-    --bg-dark: #0F1F12;
-    --bg-card: #122416;
-    --bg-toggle: #162C1A;
-    --bg-bar-track: #1E3A24;
-    --felt-green: #1E3A24;
-    --felt-green-mid: #122416;
-    --brass: #C8A951;
-    --brass-dark: #A08030;
-    --text-primary: #F0EDE4;
-    --text-secondary: #A3B8A8;
-    --text-muted: #7A9A82;
-    --text-dim: #4A6A52;
-    --green-positive: #22C55E;
-    --green-positive-light: #4ADE80;
-    --red-negative: #EF4444;
-    --red-negative-light: #F87171;
+    /* Handover design tokens */
+    --bg-darkest: #1a1a18;
+    --bg-dark: #1e1e1c;
+    --bg-card: #252420;
+    --bg-toggle: #2a2924;
+    --bg-bar-track: #3a3830;
+    --felt-green: #2a4a2a;
+    --felt-green-mid: #1a2e1a;
+    --brass: #b8943e;
+    --brass-dark: #8a6d2a;
+    --text-primary: #f5f0e8;
+    --text-secondary: #d4cfc2;
+    --text-muted: #a09882;
+    --text-dim: #706b5f;
+    --green-positive: #4a7c59;
+    --green-positive-light: #6aa57a;
+    --red-negative: #b44040;
+    --red-negative-light: #d46a6a;
 
-    /* Legacy aliases (admin pages) */
-    --felt-deep: #0B1A0F;
-    --felt: #0F1F12;
-    --felt-lit: #1E3A24;
-    --wood: #0B1A0F;
-    --wood-lit: #122416;
-    --brass-dim: #A08030;
-    --ivory: #F0EDE4;
-    --ivory-dim: #A3B8A8;
-    --ink: #0B1A0F;
-    --win: #22C55E;
-    --loss: #EF4444;
+    /* Legacy aliases (used by admin pages) */
+    --felt-deep: #1a1a18;
+    --felt: #1e1e1c;
+    --felt-lit: #2a4a2a;
+    --wood: #1a1a18;
+    --wood-lit: #252420;
+    --brass-dim: #8a6d2a;
+    --ivory: #f5f0e8;
+    --ivory-dim: #a09882;
+    --ink: #1a1a18;
+    --win: #4a7c59;
+    --loss: #b44040;
 
     /* shadcn tokens */
-    --background: 138 25% 7%;
-    --foreground: 40 20% 92%;
-    --card: 138 25% 11%;
-    --card-foreground: 40 20% 92%;
-    --popover: 138 25% 11%;
-    --popover-foreground: 40 20% 92%;
-    --primary: 43 55% 55%;
-    --primary-foreground: 138 25% 7%;
-    --secondary: 138 20% 14%;
-    --secondary-foreground: 40 20% 92%;
-    --muted: 138 20% 14%;
-    --muted-foreground: 140 15% 55%;
-    --accent: 138 20% 18%;
-    --accent-foreground: 40 20% 92%;
-    --destructive: 4 55% 57%;
-    --destructive-foreground: 40 20% 92%;
-    --border: 138 30% 18%;
-    --input: 138 25% 11%;
-    --ring: 43 55% 55%;
+    --background: 30 5% 10%;
+    --foreground: 40 35% 95%;
+    --card: 30 5% 14%;
+    --card-foreground: 40 35% 95%;
+    --popover: 30 5% 14%;
+    --popover-foreground: 40 35% 95%;
+    --primary: 38 50% 48%;
+    --primary-foreground: 30 5% 10%;
+    --secondary: 30 5% 16%;
+    --secondary-foreground: 40 35% 95%;
+    --muted: 30 5% 16%;
+    --muted-foreground: 35 15% 55%;
+    --accent: 30 5% 20%;
+    --accent-foreground: 40 35% 95%;
+    --destructive: 4 55% 47%;
+    --destructive-foreground: 40 35% 95%;
+    --border: 38 25% 28%;
+    --input: 30 5% 14%;
+    --ring: 38 50% 48%;
     --radius: 0.5rem;
   }
 
@@ -67,37 +67,8 @@
   body {
     background-color: var(--bg-darkest);
     color: var(--text-primary);
-    font-family: var(--font-dm-sans), 'Inter', Helvetica, sans-serif;
+    font-family: var(--font-dm-sans), 'DM Sans', Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
-    position: relative;
-  }
-
-  /* Background arc — top right */
-  body::before {
-    content: '';
-    position: fixed;
-    top: -40%;
-    right: -20%;
-    width: 80vw;
-    height: 80vw;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.055) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Background arc — bottom left, gold tint */
-  body::after {
-    content: '';
-    position: fixed;
-    bottom: -35%;
-    left: -18%;
-    width: 70vw;
-    height: 70vw;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(200,169,81,0.045) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
   }
 
   h1, h2, h3 {
@@ -106,21 +77,41 @@
   }
 }
 
-/* Page wrapper */
+/* Felt texture — subtle dot pattern */
+.felt-texture {
+  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3Ccircle cx='4' cy='4' r='0.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+/* Page wrapper — layered background */
 .page-wrap {
   position: relative;
-  z-index: 1;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 72px);
+  background: linear-gradient(170deg, #1a2e1a 0%, #1e1e1c 100%);
 }
 .page-wrap-dark {
   position: relative;
+  min-height: calc(100vh - 72px);
+  background: linear-gradient(170deg, #1a2e1a 0%, #1a1a18 100%);
+}
+.page-wrap::before,
+.page-wrap-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3Ccircle cx='4' cy='4' r='0.5'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.page-wrap > *,
+.page-wrap-dark > * {
+  position: relative;
   z-index: 1;
-  min-height: calc(100vh - 64px);
 }
 
 /* Brass rim highlight */
 .brass-rim {
-  box-shadow: inset 0 1px 0 rgba(200,169,81,0.2);
+  box-shadow: inset 0 1px 0 rgba(184,148,62,0.25);
 }
 
 /* Fonts */
@@ -128,7 +119,7 @@
   font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
 }
 .font-dm-sans {
-  font-family: var(--font-dm-sans), 'Inter', Helvetica, sans-serif;
+  font-family: var(--font-dm-sans), 'DM Sans', Helvetica, sans-serif;
 }
 
 /* Legacy font aliases — admin pages use these */
@@ -136,7 +127,7 @@
   font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
 }
 .font-inter {
-  font-family: var(--font-dm-sans), 'Inter', Helvetica, sans-serif;
+  font-family: var(--font-dm-sans), 'DM Sans', Helvetica, sans-serif;
 }
 .font-mono {
   font-family: var(--font-mono), 'JetBrains Mono', monospace;
@@ -175,8 +166,8 @@ label {
 /* Stat rail — horizontal strip (admin/legacy) */
 .stat-rail {
   display: grid;
-  border: 1px solid rgba(200,169,81,0.18);
-  box-shadow: inset 0 1px 0 rgba(200,169,81,0.2);
+  border: 1px solid rgba(184,148,62,0.18);
+  box-shadow: inset 0 1px 0 rgba(184,148,62,0.2);
   background: rgba(0,0,0,0.3);
 }
 .stat-rail-cell {
@@ -190,14 +181,14 @@ label {
   top: 20%;
   height: 60%;
   width: 1px;
-  background: rgba(200,169,81,0.22);
+  background: rgba(184,148,62,0.22);
 }
 
 /* Ledger panel (admin/legacy) */
 .ledger-panel {
   background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(200,169,81,0.18);
-  box-shadow: inset 0 1px 0 rgba(200,169,81,0.2);
+  border: 1px solid rgba(184,148,62,0.18);
+  box-shadow: inset 0 1px 0 rgba(184,148,62,0.2);
 }
 
 /* shadcn overrides */
