@@ -53,7 +53,6 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
       ? [podium[1], podium[0]]
       : [podium[0]]
 
-  const podiumMedals = ['🥈', '🥇', '🥉']
   const podiumHeights = [140, 180, 110]
 
   return (
@@ -92,14 +91,13 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
           {podiumOrder.map((p, i) => {
             const isFirst = podium.length >= 3 ? i === 1 : (podium.length === 2 ? i === 1 : true)
             const height = podium.length >= 3 ? podiumHeights[i] : (podium.length === 2 ? [140, 180][i] : 180)
-            const medal = podium.length >= 3 ? podiumMedals[i] : (podium.length === 2 ? ['🥈', '🥇'][i] : '🥇')
             const rank = sorted.indexOf(p) + 1
             return (
               <div key={p.id} style={{ textAlign: 'center', width: 220 }}>
-                <div style={{ fontSize: isFirst ? 48 : 36, marginBottom: 8 }}>{medal}</div>
                 <div style={{
                   fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                  fontSize: isFirst ? 22 : 18, fontWeight: 700, color: TEXT_WHITE, marginBottom: 4,
+                  fontSize: isFirst ? 22 : 18, fontWeight: 700, marginBottom: 4,
+                  color: isFirst ? GOLD : rank === 2 ? '#C0C0C0' : '#CD7F32',
                 }}>{p.name}</div>
                 <div style={{
                   fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',

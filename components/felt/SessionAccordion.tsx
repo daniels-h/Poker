@@ -14,7 +14,7 @@ interface Session {
   name: string
   notes: string | null
   player_count: number
-  avg_buyin: number
+  total_pot: number
   results: SessionPlayer[]
 }
 
@@ -84,7 +84,7 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
                 {formatDay(s.date)} · {s.name}
               </div>
             </div>
-            <MetaCell label="Buy-in" value={s.avg_buyin > 0 ? `₱${s.avg_buyin.toLocaleString()}` : '—'} />
+            <MetaCell label="Total Pot" value={s.total_pot > 0 ? `₱${s.total_pot.toLocaleString()}` : '—'} />
             <MetaCell label="Notes" value={s.notes ?? '—'} />
             <MetaCell label="Players" value={String(s.player_count)} />
             <MetaCell label="Results" value={`${s.results.filter(r => r.net > 0).length}W / ${s.results.filter(r => r.net < 0).length}L`} />

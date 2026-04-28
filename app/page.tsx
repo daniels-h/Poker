@@ -278,7 +278,7 @@ export default async function DashboardPage() {
                         fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
                         fontSize: 14, color: TEXT_GRAY,
                       }}>
-                        <span>🏆 Top Winner</span>
+                        <span>Top Winner</span>
                         <span style={{ color: '#4a7c59', fontWeight: 600 }}>
                           {lastWinner.player?.name} ({formatPnl(lastWinner.net)})
                         </span>

@@ -22,16 +22,14 @@ export default async function SessionsPage() {
         name: sp.player?.name ?? '?',
         net: sp.net ?? 0,
       }))
-    const avg_buyin = sps.length > 0
-      ? Math.round(sps.reduce((sum: number, sp: any) => sum + (sp.total_buyin ?? 0), 0) / sps.length)
-      : 0
+    const total_pot = Math.round(sps.reduce((sum: number, sp: any) => sum + (sp.total_buyin ?? 0), 0))
     return {
       id: s.id,
       date: s.date,
       name: s.name,
       notes: s.notes ?? null,
       player_count: sps.length,
-      avg_buyin,
+      total_pot,
       results,
     }
   })
