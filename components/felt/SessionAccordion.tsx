@@ -114,7 +114,7 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
                 gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
                 gap: 8,
               }}>
-                {s.results.map((r, i) => (
+                {s.results.map((r) => (
                   <div key={r.player_id} style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '10px 16px', borderRadius: 8,
@@ -126,7 +126,7 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
                     fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
                     fontSize: 14, color: TEXT_GRAY,
                   }}>
-                    <span>{i === 0 && '🏆 '}{r.name}</span>
+                    <span>{r.name}</span>
                     <span style={{
                       fontWeight: 700,
                       color: r.net > 0 ? '#4a7c59' : r.net < 0 ? '#b44040' : TEXT_DIM,

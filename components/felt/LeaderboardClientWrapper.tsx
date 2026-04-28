@@ -88,16 +88,15 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
           display: 'flex', gap: 20, marginBottom: 40,
           justifyContent: 'center', alignItems: 'flex-end',
         }}>
-          {podiumOrder.map((p, i) => {
-            const isFirst = podium.length >= 3 ? i === 1 : (podium.length === 2 ? i === 1 : true)
-            const height = podium.length >= 3 ? podiumHeights[i] : (podium.length === 2 ? [140, 180][i] : 180)
+          {podiumOrder.map((p, _i) => {
+            const height = podium.length >= 3 ? podiumHeights[_i] : (podium.length === 2 ? [140, 180][_i] : 180)
             const rank = sorted.indexOf(p) + 1
             return (
               <div key={p.id} style={{ textAlign: 'center', width: 220 }}>
                 <div style={{
                   fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                  fontSize: isFirst ? 22 : 18, fontWeight: 700, marginBottom: 4,
-                  color: isFirst ? GOLD : rank === 2 ? '#C0C0C0' : '#CD7F32',
+                  fontSize: rank === 1 ? 22 : 18, fontWeight: 700, marginBottom: 4,
+                  color: rank === 1 ? GOLD : rank === 2 ? '#C0C0C0' : '#CD7F32',
                 }}>{p.name}</div>
                 <div style={{
                   fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
@@ -107,15 +106,17 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
                 </div>
                 <div style={{
                   height,
-                  background: isFirst
+                  background: rank === 1
                     ? `linear-gradient(180deg, ${GOLD} 0%, #8a6d2a 100%)`
-                    : 'linear-gradient(180deg, #8a8a8a 0%, #5a5a5a 100%)',
+                    : rank === 2
+                      ? 'linear-gradient(180deg, #C0C0C0 0%, #888888 100%)'
+                      : 'linear-gradient(180deg, #CD7F32 0%, #8B4513 100%)',
                   borderRadius: '8px 8px 0 0',
                   display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
                   paddingTop: 16,
                   fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
                   fontSize: 32, fontWeight: 700,
-                  color: isFirst ? '#111611' : '#fff',
+                  color: rank === 1 ? '#111611' : '#fff',
                 }}>
                   {rank}
                 </div>
