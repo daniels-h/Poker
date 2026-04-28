@@ -32,32 +32,28 @@ export default async function LeaderboardPage() {
   return (
     <div className="page-wrap">
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 40px' }}>
-        {/* Section header */}
-        <div style={{ marginBottom: 32 }}>
+        <div style={{ marginBottom: 36 }}>
           <h2 style={{
             fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-            fontSize: 32, fontWeight: 700, color: '#f5f0e8', margin: 0,
+            fontSize: 32, fontWeight: 700, color: '#F0EDE4', margin: 0,
           }}>Leaderboards</h2>
           <p style={{
-            fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
-            fontSize: 15, color: '#706b5f', marginTop: 6,
+            fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
+            fontSize: 15, color: '#7A9A82', marginTop: 6,
           }}>Season rankings across all sessions</p>
-          <div style={{
-            width: 60, height: 3, background: '#b8943e', borderRadius: 2, marginTop: 12,
-          }} />
+          <div style={{ width: 48, height: 2, background: '#C8A951', borderRadius: 2, marginTop: 14 }} />
         </div>
 
         <LeaderboardClientWrapper rows={rows} />
       </div>
 
-      {/* Footer */}
       <footer style={{
-        background: '#1a1a18', borderTop: '2px solid #b8943e',
-        padding: '32px 40px', textAlign: 'center',
-        fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
-        color: '#706b5f', fontSize: 13, marginTop: 48,
+        borderTop: '1px solid #1E3A24',
+        padding: '28px 40px', textAlign: 'center',
+        fontFamily: 'var(--font-dm-sans), Inter, sans-serif',
+        color: '#4A6A52', fontSize: 13, marginTop: 48,
       }}>
-        <span style={{ color: '#b8943e', marginRight: 8 }}>♠♥♦♣</span>
+        <span style={{ color: '#C8A951', marginRight: 8, opacity: 0.6 }}>♠♥♦♣</span>
         Poker Open Play © 2026 — All rights reserved
       </footer>
     </div>

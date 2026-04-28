@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Playfair_Display, DM_Sans, JetBrains_Mono } from 'next/font/google'
+import { Playfair_Display, Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import AppShell from '@/components/felt/AppShell'
 
@@ -9,7 +9,7 @@ const playfairDisplay = Playfair_Display({
   weight: ['400', '600', '700', '800'],
 })
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-dm-sans',
   weight: ['400', '500', '600', '700'],
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${playfairDisplay.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen" style={{ backgroundColor: '#1a1a18' }}>
+    <html lang="en" className={`${playfairDisplay.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="min-h-screen" style={{ backgroundColor: '#0B1A0F' }}>
         <AppShell>{children}</AppShell>
       </body>
     </html>
