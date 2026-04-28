@@ -28,6 +28,13 @@ function formatDay(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', { weekday: 'long' })
 }
 
+const GOLD = '#C9A84C'
+const CARD_BG = 'rgba(20,25,20,0.75)'
+const CARD_BORDER = 'rgba(201,168,76,0.15)'
+const TEXT_WHITE = '#E5E7EB'
+const TEXT_GRAY = '#9CA3AF'
+const TEXT_DIM = '#6B7280'
+
 export default function SessionAccordion({ sessions }: { sessions: Session[] }) {
   const [expanded, setExpanded] = useState<string | null>(null)
 
@@ -36,7 +43,7 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
       <p style={{
         textAlign: 'center', padding: '64px 0',
         fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-        fontStyle: 'italic', fontSize: 16, color: '#706b5f',
+        fontStyle: 'italic', fontSize: 16, color: TEXT_DIM,
       }}>
         No sessions yet. The books are open.
       </p>
@@ -47,10 +54,10 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {sessions.map(s => (
         <div key={s.id} style={{
-          background: '#252420', borderRadius: 12,
-          border: '1px solid rgba(184,148,62,0.2)',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
+          background: CARD_BG, borderRadius: 12,
+          border: `1px solid ${CARD_BORDER}`,
           overflow: 'hidden',
+          backdropFilter: 'blur(8px)',
         }}>
           {/* Summary row */}
           <div
@@ -60,19 +67,19 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
               gridTemplateColumns: '1.5fr 1fr 0.8fr 0.8fr 0.6fr 40px',
               alignItems: 'center', padding: '20px 28px', cursor: 'pointer',
               transition: 'background 0.15s',
-              background: expanded === s.id ? 'rgba(184,148,62,0.06)' : 'transparent',
+              background: expanded === s.id ? 'rgba(201,168,76,0.05)' : 'transparent',
             }}
           >
             <div>
               <div style={{
                 fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                fontSize: 17, fontWeight: 700, color: '#f5f0e8',
+                fontSize: 17, fontWeight: 700, color: TEXT_WHITE,
               }}>
                 {formatDate(s.date)}
               </div>
               <div style={{
                 fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
-                fontSize: 13, color: '#706b5f', marginTop: 2,
+                fontSize: 13, color: TEXT_DIM, marginTop: 2,
               }}>
                 {formatDay(s.date)} · {s.name}
               </div>
@@ -82,7 +89,7 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
             <MetaCell label="Players" value={String(s.player_count)} />
             <MetaCell label="Results" value={`${s.results.filter(r => r.net > 0).length}W / ${s.results.filter(r => r.net < 0).length}L`} />
             <div style={{
-              color: '#b8943e', fontSize: 18, textAlign: 'right',
+              color: GOLD, fontSize: 18, textAlign: 'right',
               transition: 'transform 0.2s',
               transform: expanded === s.id ? 'rotate(180deg)' : 'rotate(0)',
             }}>▾</div>
@@ -90,10 +97,14 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
 
           {/* Expanded results */}
           {expanded === s.id && (
-            <div style={{ borderTop: '2px solid #b8943e', padding: '20px 28px', background: '#1e1c18' }}>
+            <div style={{
+              borderTop: `1px solid rgba(201,168,76,0.25)`,
+              padding: '20px 28px',
+              background: 'rgba(0,0,0,0.2)',
+            }}>
               <div style={{
                 fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
-                fontSize: 12, color: '#a09882', textTransform: 'uppercase',
+                fontSize: 12, color: TEXT_GRAY, textTransform: 'uppercase',
                 letterSpacing: '0.1em', marginBottom: 12,
               }}>
                 Player Results
@@ -108,20 +119,17 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '10px 16px', borderRadius: 8,
                     background: r.net > 0
-                      ? 'rgba(74,124,89,0.15)'
+                      ? 'rgba(74,124,89,0.12)'
                       : r.net < 0
-                        ? 'rgba(180,60,60,0.12)'
-                        : 'rgba(255,255,255,0.05)',
+                        ? 'rgba(180,64,64,0.10)'
+                        : 'rgba(255,255,255,0.04)',
                     fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
-                    fontSize: 14, color: '#d4cfc2',
+                    fontSize: 14, color: TEXT_GRAY,
                   }}>
-                    <span>
-                      {i === 0 && '🏆 '}{r.name}
-                    </span>
+                    <span>{i === 0 && '🏆 '}{r.name}</span>
                     <span style={{
                       fontWeight: 700,
-                      fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                      color: r.net > 0 ? '#4a7c59' : r.net < 0 ? '#b44040' : '#706b5f',
+                      color: r.net > 0 ? '#4a7c59' : r.net < 0 ? '#b44040' : TEXT_DIM,
                     }}>
                       {r.net > 0 ? `+₱${r.net.toLocaleString()}` : r.net < 0 ? `−₱${Math.abs(r.net).toLocaleString()}` : 'Even'}
                     </span>
@@ -138,9 +146,9 @@ export default function SessionAccordion({ sessions }: { sessions: Session[] }) 
 
 function MetaCell({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif', fontSize: 14, color: '#d4cfc2' }}>
+    <div style={{ fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif', fontSize: 14, color: '#E5E7EB' }}>
       <span style={{
-        display: 'block', fontSize: 11, color: '#a09882',
+        display: 'block', fontSize: 11, color: '#9CA3AF',
         textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2,
       }}>{label}</span>
       {value}

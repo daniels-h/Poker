@@ -4,58 +4,58 @@
 
 @layer base {
   :root {
-    /* Handover design tokens */
-    --bg-darkest: #1a1a18;
-    --bg-dark: #1e1e1c;
-    --bg-card: #252420;
-    --bg-toggle: #2a2924;
-    --bg-bar-track: #3a3830;
-    --felt-green: #2a4a2a;
-    --felt-green-mid: #1a2e1a;
-    --brass: #b8943e;
-    --brass-dark: #8a6d2a;
-    --text-primary: #f5f0e8;
-    --text-secondary: #d4cfc2;
-    --text-muted: #a09882;
-    --text-dim: #706b5f;
+    /* Gold premium palette */
+    --bg-darkest: #111611;
+    --bg-dark: #141A14;
+    --bg-card: rgba(25, 30, 25, 0.7);
+    --bg-toggle: #1A201A;
+    --bg-bar-track: #252B25;
+    --felt-green: #1A2A1A;
+    --felt-green-mid: #111611;
+    --brass: #C9A84C;
+    --brass-dark: #A07830;
+    --text-primary: #E5E7EB;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --text-dim: #4B5563;
     --green-positive: #4a7c59;
     --green-positive-light: #6aa57a;
     --red-negative: #b44040;
     --red-negative-light: #d46a6a;
 
-    /* Legacy aliases (used by admin pages) */
-    --felt-deep: #1a1a18;
-    --felt: #1e1e1c;
-    --felt-lit: #2a4a2a;
-    --wood: #1a1a18;
-    --wood-lit: #252420;
-    --brass-dim: #8a6d2a;
-    --ivory: #f5f0e8;
-    --ivory-dim: #a09882;
-    --ink: #1a1a18;
+    /* Legacy aliases (admin pages) */
+    --felt-deep: #111611;
+    --felt: #141A14;
+    --felt-lit: #1A2A1A;
+    --wood: #111611;
+    --wood-lit: #1E251E;
+    --brass-dim: #A07830;
+    --ivory: #E5E7EB;
+    --ivory-dim: #6B7280;
+    --ink: #111611;
     --win: #4a7c59;
     --loss: #b44040;
 
     /* shadcn tokens */
-    --background: 30 5% 10%;
-    --foreground: 40 35% 95%;
-    --card: 30 5% 14%;
-    --card-foreground: 40 35% 95%;
-    --popover: 30 5% 14%;
-    --popover-foreground: 40 35% 95%;
-    --primary: 38 50% 48%;
-    --primary-foreground: 30 5% 10%;
-    --secondary: 30 5% 16%;
-    --secondary-foreground: 40 35% 95%;
-    --muted: 30 5% 16%;
-    --muted-foreground: 35 15% 55%;
-    --accent: 30 5% 20%;
-    --accent-foreground: 40 35% 95%;
+    --background: 120 10% 8%;
+    --foreground: 220 15% 91%;
+    --card: 120 10% 11%;
+    --card-foreground: 220 15% 91%;
+    --popover: 120 10% 11%;
+    --popover-foreground: 220 15% 91%;
+    --primary: 43 55% 54%;
+    --primary-foreground: 120 10% 8%;
+    --secondary: 120 8% 14%;
+    --secondary-foreground: 220 15% 91%;
+    --muted: 120 8% 14%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 120 8% 18%;
+    --accent-foreground: 220 15% 91%;
     --destructive: 4 55% 47%;
-    --destructive-foreground: 40 35% 95%;
-    --border: 38 25% 28%;
-    --input: 30 5% 14%;
-    --ring: 38 50% 48%;
+    --destructive-foreground: 220 15% 91%;
+    --border: 120 15% 22%;
+    --input: 120 10% 11%;
+    --ring: 43 55% 54%;
     --radius: 0.5rem;
   }
 
@@ -77,30 +77,30 @@
   }
 }
 
-/* Felt texture — subtle dot pattern */
+/* Poker felt texture — subtle dot pattern */
 .felt-texture {
-  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3Ccircle cx='4' cy='4' r='0.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23ffffff' fill-opacity='0.6'/%3E%3C/svg%3E");
   background-repeat: repeat;
 }
 
-/* Page wrapper — layered background */
+/* Page wrapper */
 .page-wrap {
   position: relative;
   min-height: calc(100vh - 72px);
-  background: linear-gradient(170deg, #1a2e1a 0%, #1e1e1c 100%);
+  background: linear-gradient(170deg, #141A14 0%, #111611 100%);
 }
 .page-wrap-dark {
   position: relative;
   min-height: calc(100vh - 72px);
-  background: linear-gradient(170deg, #1a2e1a 0%, #1a1a18 100%);
+  background: linear-gradient(170deg, #141A14 0%, #0F170F 100%);
 }
 .page-wrap::before,
 .page-wrap-dark::before {
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0.06;
-  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3Ccircle cx='4' cy='4' r='0.5'/%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23ffffff' fill-opacity='1'/%3E%3C/svg%3E");
   pointer-events: none;
 }
 .page-wrap > *,
@@ -111,7 +111,7 @@
 
 /* Brass rim highlight */
 .brass-rim {
-  box-shadow: inset 0 1px 0 rgba(184,148,62,0.25);
+  box-shadow: inset 0 1px 0 rgba(201,168,76,0.2);
 }
 
 /* Fonts */
@@ -166,8 +166,8 @@ label {
 /* Stat rail — horizontal strip (admin/legacy) */
 .stat-rail {
   display: grid;
-  border: 1px solid rgba(184,148,62,0.18);
-  box-shadow: inset 0 1px 0 rgba(184,148,62,0.2);
+  border: 1px solid rgba(201,168,76,0.15);
+  box-shadow: inset 0 1px 0 rgba(201,168,76,0.18);
   background: rgba(0,0,0,0.3);
 }
 .stat-rail-cell {
@@ -181,14 +181,14 @@ label {
   top: 20%;
   height: 60%;
   width: 1px;
-  background: rgba(184,148,62,0.22);
+  background: rgba(201,168,76,0.2);
 }
 
 /* Ledger panel (admin/legacy) */
 .ledger-panel {
   background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(184,148,62,0.18);
-  box-shadow: inset 0 1px 0 rgba(184,148,62,0.2);
+  border: 1px solid rgba(201,168,76,0.15);
+  box-shadow: inset 0 1px 0 rgba(201,168,76,0.18);
 }
 
 /* shadcn overrides */

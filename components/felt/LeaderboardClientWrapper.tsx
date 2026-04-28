@@ -11,6 +11,13 @@ export interface LeaderboardEntry {
   totalPnl: number
 }
 
+const GOLD = '#C9A84C'
+const CARD_BG = 'rgba(20,25,20,0.75)'
+const CARD_BORDER = 'rgba(201,168,76,0.15)'
+const TEXT_WHITE = '#E5E7EB'
+const TEXT_GRAY = '#9CA3AF'
+const TEXT_DIM = '#6B7280'
+
 function formatPnl(amount: number): string {
   const abs = Math.abs(Math.round(amount))
   if (amount > 0) return `+₱${abs.toLocaleString()}`
@@ -32,7 +39,7 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
       <p style={{
         textAlign: 'center', padding: '64px 0',
         fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-        fontStyle: 'italic', fontSize: 16, color: '#706b5f',
+        fontStyle: 'italic', fontSize: 16, color: TEXT_DIM,
       }}>
         No sessions yet. The books are open.
       </p>
@@ -54,7 +61,9 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
       {/* Sort toggle */}
       <div style={{
         display: 'flex', gap: 4, marginBottom: 32,
-        background: '#2a2924', borderRadius: 8, padding: 4, width: 'fit-content',
+        background: 'rgba(0,0,0,0.3)', borderRadius: 8, padding: 4,
+        width: 'fit-content',
+        border: `1px solid ${CARD_BORDER}`,
       }}>
         {([['profit', 'Total Profit'], ['winRate', 'Win Rate']] as const).map(([k, label]) => (
           <button
@@ -64,8 +73,8 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
               padding: '10px 24px', borderRadius: 6, border: 'none', cursor: 'pointer',
               fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
               fontSize: 14, fontWeight: 600,
-              background: sortBy === k ? '#b8943e' : 'transparent',
-              color: sortBy === k ? '#1a1a18' : '#a09882',
+              background: sortBy === k ? GOLD : 'transparent',
+              color: sortBy === k ? '#111611' : TEXT_GRAY,
               transition: 'all 0.2s',
             }}
           >
@@ -90,25 +99,25 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
                 <div style={{ fontSize: isFirst ? 48 : 36, marginBottom: 8 }}>{medal}</div>
                 <div style={{
                   fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-                  fontSize: isFirst ? 22 : 18, fontWeight: 700, color: '#f5f0e8', marginBottom: 4,
+                  fontSize: isFirst ? 22 : 18, fontWeight: 700, color: TEXT_WHITE, marginBottom: 4,
                 }}>{p.name}</div>
                 <div style={{
                   fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
-                  fontSize: 14, color: '#706b5f', marginBottom: 12,
+                  fontSize: 14, color: TEXT_DIM, marginBottom: 12,
                 }}>
                   {sortBy === 'profit' ? formatPnl(p.totalPnl) : `${p.winRate}% win rate`}
                 </div>
                 <div style={{
                   height,
                   background: isFirst
-                    ? 'linear-gradient(180deg, #b8943e 0%, #8a6d2a 100%)'
-                    : 'linear-gradient(180deg, #d4cfc2 0%, #aba595 100%)',
+                    ? `linear-gradient(180deg, ${GOLD} 0%, #8a6d2a 100%)`
+                    : 'linear-gradient(180deg, #8a8a8a 0%, #5a5a5a 100%)',
                   borderRadius: '8px 8px 0 0',
                   display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
                   paddingTop: 16,
                   fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
                   fontSize: 32, fontWeight: 700,
-                  color: isFirst ? '#1a1a18' : '#fff',
+                  color: isFirst ? '#111611' : '#fff',
                 }}>
                   {rank}
                 </div>
@@ -120,17 +129,19 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
 
       {/* Full table */}
       <div style={{
-        background: '#252420', borderRadius: 12,
-        border: '1px solid rgba(184,148,62,0.2)',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.3)', overflow: 'hidden',
+        background: CARD_BG, borderRadius: 12,
+        border: `1px solid ${CARD_BORDER}`,
+        backdropFilter: 'blur(8px)',
+        overflow: 'hidden',
       }}>
         {/* Header */}
         <div style={{
           display: 'grid', gridTemplateColumns: '60px 1.5fr 1fr 1fr 1fr',
-          padding: '14px 28px', background: '#1a1a18',
+          padding: '14px 28px', background: 'rgba(0,0,0,0.3)',
           fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
-          fontSize: 12, color: '#a09882',
-          textTransform: 'uppercase', letterSpacing: '0.1em',
+          fontSize: 11, color: TEXT_GRAY,
+          textTransform: 'uppercase', letterSpacing: '0.12em',
+          borderBottom: `1px solid ${CARD_BORDER}`,
         }}>
           <span>#</span>
           <span>Player</span>
@@ -143,25 +154,25 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
           <div key={p.id} style={{
             display: 'grid', gridTemplateColumns: '60px 1.5fr 1fr 1fr 1fr',
             padding: '16px 28px', alignItems: 'center',
-            borderBottom: i < sorted.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-            background: i < 3 ? 'rgba(184,148,62,0.06)' : 'transparent',
+            borderBottom: i < sorted.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
+            background: i < 3 ? 'rgba(201,168,76,0.04)' : 'transparent',
             fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif', fontSize: 15,
           }}>
             <span style={{
               fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
-              fontWeight: 700, color: i < 3 ? '#b8943e' : '#a09882', fontSize: 18,
+              fontWeight: 700, color: i < 3 ? GOLD : TEXT_DIM, fontSize: 18,
             }}>{i + 1}</span>
 
             <div>
-              <div style={{ fontWeight: 600, color: '#f5f0e8' }}>{p.name}</div>
+              <div style={{ fontWeight: 600, color: TEXT_WHITE }}>{p.name}</div>
               {p.nickname && (
-                <div style={{ fontSize: 12, color: '#b8943e', fontStyle: 'italic' }}>
+                <div style={{ fontSize: 12, color: GOLD, fontStyle: 'italic' }}>
                   "{p.nickname}"
                 </div>
               )}
             </div>
 
-            <span style={{ color: '#706b5f' }}>{p.sessions}</span>
+            <span style={{ color: TEXT_DIM }}>{p.sessions}</span>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <span style={{
@@ -172,7 +183,7 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
                 {formatPnl(p.totalPnl)}
               </span>
               <div style={{
-                flex: 1, height: 6, background: '#3a3830', borderRadius: 3,
+                flex: 1, height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 3,
                 overflow: 'hidden', maxWidth: 100,
               }}>
                 <div style={{
@@ -186,15 +197,15 @@ export default function LeaderboardClientWrapper({ rows }: { rows: LeaderboardEn
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ color: '#f5f0e8', fontWeight: 600 }}>{p.winRate}%</span>
+              <span style={{ color: TEXT_WHITE, fontWeight: 600 }}>{p.winRate}%</span>
               <div style={{
                 width: 48, height: 48, borderRadius: '50%',
-                background: `conic-gradient(#b8943e ${p.winRate * 3.6}deg, #3a3830 ${p.winRate * 3.6}deg)`,
+                background: `conic-gradient(${GOLD} ${p.winRate * 3.6}deg, rgba(255,255,255,0.08) ${p.winRate * 3.6}deg)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: '50%',
-                  background: i < 3 ? '#2a2924' : '#252420',
+                  background: i < 3 ? 'rgba(20,25,20,0.9)' : 'rgba(15,23,15,0.9)',
                 }} />
               </div>
             </div>
