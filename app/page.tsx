@@ -169,14 +169,14 @@ export default async function DashboardPage() {
               borderRadius: 12, padding: '28px 24px', textAlign: 'center',
               backdropFilter: 'blur(8px)', flex: '1 1 200px',
             }}>
-              {/* Suit icon — muted white */}
+              {/* Suit icon — white */}
               <div style={{
                 fontSize: 24, marginBottom: 10,
-                color: 'rgba(255,255,255,0.35)',
+                color: '#ffffff',
                 fontFamily: 'Georgia, serif',
               }}>{icon}</div>
               <div style={{
-                fontSize: 36,
+                fontSize: 48,
                 fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
                 fontWeight: 700, color: GOLD, marginBottom: 6,
               }}>{value}</div>
@@ -311,7 +311,6 @@ export default async function DashboardPage() {
             <div style={{ padding: '24px' }}>
               {seasonLeader ? (
                 <>
-                  <div style={{ fontSize: 44, marginBottom: 10, color: GOLD, fontFamily: 'Georgia, serif' }}>♠</div>
                   <div style={{
                     fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
                     fontSize: 22, fontWeight: 700, color: TEXT_WHITE,
