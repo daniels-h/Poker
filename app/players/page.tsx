@@ -1,95 +1,83 @@
 import { createClient } from '@/lib/supabase/server'
-import PageHeader from '@/components/felt/PageHeader'
-import Link from 'next/link'
+import PlayerCardGrid from '@/components/felt/PlayerCardGrid'
+import { computeStreak } from '@/lib/stats'
 
 export const revalidate = 0
 
 export default async function PlayersPage() {
   const supabase = createClient()
-  const { data: players } = await supabase.from('players').select('*').eq('active', true).order('name')
-  const { data: allSps } = await supabase.from('session_players').select('player_id, net')
 
-  const netMap = new Map<string, number>()
+  const { data: players } = await supabase
+    .from('players')
+    .select('*')
+    .eq('active', true)
+    .order('name')
+
+  const { data: allSps } = await supabase
+    .from('session_players')
+    .select('player_id, net, session:sessions(date)')
+
+  // Build per-player history sorted by session date
+  const histMap = new Map<string, { net: number; date: string }[]>()
   for (const sp of allSps ?? []) {
-    netMap.set(sp.player_id, (netMap.get(sp.player_id) ?? 0) + (sp.net ?? 0))
+    const date = (sp.session as any)?.date ?? ''
+    if (!histMap.has(sp.player_id)) histMap.set(sp.player_id, [])
+    histMap.get(sp.player_id)!.push({ net: sp.net ?? 0, date })
   }
+  Array.from(histMap.values()).forEach(hist => {
+    hist.sort((a, b) => a.date.localeCompare(b.date))
+  })
+
+  const playerCards = (players ?? []).map((player: any) => {
+    const hist = histMap.get(player.id) ?? []
+    const nets = hist.map(h => h.net)
+    const totalPnl = nets.reduce((a, b) => a + b, 0)
+    const winRate = nets.length > 0
+      ? Math.round((nets.filter(n => n > 0).length / nets.length) * 100)
+      : 0
+    return {
+      id: player.id,
+      name: player.name,
+      nickname: player.nickname ?? null,
+      sessions: nets.length,
+      totalPnl,
+      winRate,
+      streak: computeStreak(nets),
+      history: nets.slice(-8),
+    }
+  }).sort((a, b) => b.totalPnl - a.totalPnl)
 
   return (
-    <div className="max-w-3xl">
-      <PageHeader eyebrow="The Rail" title="Players" subtitle="The regulars. The grinders. The fish." />
-
-      <div style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(138,115,64,0.6)', borderRadius: 4, overflow: 'hidden' }}>
-        {/* Header */}
-        <div
-          className="grid font-mono uppercase"
-          style={{
-            gridTemplateColumns: '48px 1fr 1fr 1fr',
-            gap: 16,
-            padding: '12px 24px',
-            borderBottom: '1px solid rgba(138,115,64,0.6)',
-            fontSize: 10,
-            color: 'var(--brass)',
-            letterSpacing: '0.15em',
-          }}
-        >
-          <div>#</div>
-          <div>Player</div>
-          <div className="text-right">Nickname</div>
-          <div className="text-right">All-Time Net</div>
+    <div className="page-wrap">
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 40px' }}>
+        {/* Section header */}
+        <div style={{ marginBottom: 32 }}>
+          <h2 style={{
+            fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+            fontSize: 32, fontWeight: 700, color: '#f5f0e8', margin: 0,
+          }}>Players</h2>
+          <p style={{
+            fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+            fontSize: 15, color: '#706b5f', marginTop: 6,
+          }}>Club roster and individual stats</p>
+          <div style={{
+            width: 60, height: 3, background: '#b8943e', borderRadius: 2, marginTop: 12,
+          }} />
         </div>
 
-        {(players ?? []).map((player: any, i: number) => {
-          const net = netMap.get(player.id) ?? 0
-          const netCol = net >= 0 ? 'var(--win)' : 'var(--loss)'
-          return (
-            <Link key={player.id} href={`/players/${player.id}`} className="block">
-              <div
-                className="grid items-center hover:bg-white/[0.02] transition-colors"
-                style={{
-                  gridTemplateColumns: '48px 1fr 1fr 1fr',
-                  gap: 16,
-                  padding: '18px 24px',
-                  borderBottom: i < (players ?? []).length - 1 ? '1px solid rgba(138,115,64,0.15)' : 'none',
-                }}
-              >
-                <div className="font-fraunces italic" style={{ fontSize: 22, color: 'var(--brass)' }}>{i + 1}</div>
-                <div className="flex items-center gap-3">
-                  <div
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: '50%',
-                      background: 'var(--felt-deep)',
-                      border: '1px solid var(--brass-dim)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span className="font-fraunces" style={{ fontSize: 16, color: 'var(--brass)' }}>
-                      {player.name.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="font-fraunces text-ivory" style={{ fontSize: 17 }}>{player.name}</span>
-                </div>
-                <div className="font-fraunces italic text-right" style={{ fontSize: 13, color: 'var(--brass)' }}>
-                  {player.nickname ? `"${player.nickname}"` : '—'}
-                </div>
-                <div className="font-fraunces text-right" style={{ fontSize: 20, color: netCol }}>
-                  {net > 0 ? `+₱${net.toLocaleString()}` : net < 0 ? `−₱${Math.abs(net).toLocaleString()}` : '₱0'}
-                </div>
-              </div>
-            </Link>
-          )
-        })}
-
-        {(!players || players.length === 0) && (
-          <p className="font-fraunces italic text-center py-16" style={{ color: 'var(--ivory-dim)', fontSize: 16 }}>
-            No players yet. The books are open.
-          </p>
-        )}
+        <PlayerCardGrid players={playerCards} />
       </div>
+
+      {/* Footer */}
+      <footer style={{
+        background: '#1a1a18', borderTop: '2px solid #b8943e',
+        padding: '32px 40px', textAlign: 'center',
+        fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+        color: '#706b5f', fontSize: 13, marginTop: 48,
+      }}>
+        <span style={{ color: '#b8943e', marginRight: 8 }}>♠♥♦♣</span>
+        Poker Open Play © 2026 — All rights reserved
+      </footer>
     </div>
   )
 }

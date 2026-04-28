@@ -4,41 +4,59 @@
 
 @layer base {
   :root {
-    /* Felt palette */
-    --felt: #162e22;
-    --felt-deep: #0d1f17;
-    --felt-lit: #1e5038;
-    --wood: #1e0e06;
-    --wood-lit: #3a1c0a;
-    --brass: #c9a961;
-    --brass-dim: #7a6535;
-    --ivory: #f4ecd8;
-    --ivory-dim: #c8bb9a;
-    --ink: #1a1410;
-    --win: #4dbe6a;
-    --loss: #d45a50;
+    /* Handover design tokens */
+    --bg-darkest: #1a1a18;
+    --bg-dark: #1e1e1c;
+    --bg-card: #252420;
+    --bg-toggle: #2a2924;
+    --bg-bar-track: #3a3830;
+    --felt-green: #2a4a2a;
+    --felt-green-mid: #1a2e1a;
+    --brass: #b8943e;
+    --brass-dark: #8a6d2a;
+    --text-primary: #f5f0e8;
+    --text-secondary: #d4cfc2;
+    --text-muted: #a09882;
+    --text-dim: #706b5f;
+    --green-positive: #4a7c59;
+    --green-positive-light: #6aa57a;
+    --red-negative: #b44040;
+    --red-negative-light: #d46a6a;
 
-    /* shadcn tokens mapped to felt palette */
-    --background: 156 43% 13%;
-    --foreground: 40 60% 90%;
-    --card: 156 43% 10%;
-    --card-foreground: 40 60% 90%;
-    --popover: 156 43% 10%;
-    --popover-foreground: 40 60% 90%;
-    --primary: 40 50% 58%;
-    --primary-foreground: 30 50% 8%;
-    --secondary: 156 43% 16%;
-    --secondary-foreground: 40 60% 90%;
-    --muted: 156 43% 16%;
-    --muted-foreground: 40 35% 62%;
-    --accent: 156 43% 20%;
-    --accent-foreground: 40 60% 90%;
-    --destructive: 4 62% 57%;
-    --destructive-foreground: 40 60% 90%;
-    --border: 40 25% 28%;
-    --input: 156 43% 10%;
-    --ring: 40 50% 58%;
-    --radius: 0.125rem;
+    /* Legacy aliases (used by admin pages) */
+    --felt-deep: #1a1a18;
+    --felt: #1e1e1c;
+    --felt-lit: #2a4a2a;
+    --wood: #1a1a18;
+    --wood-lit: #252420;
+    --brass-dim: #8a6d2a;
+    --ivory: #f5f0e8;
+    --ivory-dim: #a09882;
+    --ink: #1a1a18;
+    --win: #4a7c59;
+    --loss: #b44040;
+
+    /* shadcn tokens */
+    --background: 30 5% 10%;
+    --foreground: 40 35% 95%;
+    --card: 30 5% 14%;
+    --card-foreground: 40 35% 95%;
+    --popover: 30 5% 14%;
+    --popover-foreground: 40 35% 95%;
+    --primary: 38 50% 48%;
+    --primary-foreground: 30 5% 10%;
+    --secondary: 30 5% 16%;
+    --secondary-foreground: 40 35% 95%;
+    --muted: 30 5% 16%;
+    --muted-foreground: 35 15% 55%;
+    --accent: 30 5% 20%;
+    --accent-foreground: 40 35% 95%;
+    --destructive: 4 55% 47%;
+    --destructive-foreground: 40 35% 95%;
+    --border: 38 25% 28%;
+    --input: 30 5% 14%;
+    --ring: 38 50% 48%;
+    --radius: 0.5rem;
   }
 
   * {
@@ -47,56 +65,73 @@
   }
 
   body {
-    background-color: var(--felt-deep);
-    color: var(--ivory);
-    font-family: var(--font-inter), 'Inter', sans-serif;
+    background-color: var(--bg-darkest);
+    color: var(--text-primary);
+    font-family: var(--font-dm-sans), 'DM Sans', Helvetica, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
   h1, h2, h3 {
+    font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
     text-wrap: balance;
   }
-
-  /* Tabular numbers everywhere they matter */
-  .font-mono,
-  [class*="font-mono"] {
-    font-variant-numeric: tabular-nums;
-  }
 }
 
-/* Felt texture — richer grain */
+/* Felt texture — subtle dot pattern */
 .felt-texture {
-  position: relative;
+  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3Ccircle cx='4' cy='4' r='0.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat;
 }
-.felt-texture::before {
+
+/* Page wrapper — layered background */
+.page-wrap {
+  position: relative;
+  min-height: calc(100vh - 72px);
+  background: linear-gradient(170deg, #1a2e1a 0%, #1e1e1c 100%);
+}
+.page-wrap-dark {
+  position: relative;
+  min-height: calc(100vh - 72px);
+  background: linear-gradient(170deg, #1a2e1a 0%, #1a1a18 100%);
+}
+.page-wrap::before,
+.page-wrap-dark::before {
   content: '';
   position: absolute;
   inset: 0;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='1' cy='1' r='0.5'/%3E%3Ccircle cx='4' cy='4' r='0.5'/%3E%3C/g%3E%3C/svg%3E");
   pointer-events: none;
-  background-image:
-    radial-gradient(circle at 1px 1px, rgba(0,0,0,0.18) 1px, transparent 0),
-    radial-gradient(circle at 4px 3px, rgba(255,255,255,0.015) 1px, transparent 0),
-    radial-gradient(circle at 2px 5px, rgba(0,0,0,0.08) 1px, transparent 0);
-  background-size: 5px 5px, 7px 7px, 9px 9px;
-  opacity: 0.7;
-  z-index: 0;
 }
-.felt-texture > * {
+.page-wrap > *,
+.page-wrap-dark > * {
   position: relative;
   z-index: 1;
 }
 
-/* Page background — overhead lamp effect */
-.felt-glow {
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,169,97,0.06) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 90%, rgba(0,0,0,0.4) 0%, transparent 50%),
-    var(--felt-deep);
+/* Brass rim highlight */
+.brass-rim {
+  box-shadow: inset 0 1px 0 rgba(184,148,62,0.25);
 }
 
-/* Brass top-rim highlight on panels */
-.brass-rim {
-  box-shadow: inset 0 1px 0 rgba(201,169,97,0.25);
+/* Fonts */
+.font-playfair {
+  font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
+}
+.font-dm-sans {
+  font-family: var(--font-dm-sans), 'DM Sans', Helvetica, sans-serif;
+}
+
+/* Legacy font aliases — admin pages use these */
+.font-fraunces {
+  font-family: var(--font-playfair), 'Playfair Display', Georgia, serif;
+}
+.font-inter {
+  font-family: var(--font-dm-sans), 'DM Sans', Helvetica, sans-serif;
+}
+.font-mono {
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Focus ring */
@@ -118,19 +153,21 @@ label {
   color: var(--ivory);
 }
 
-/* shadcn overrides */
-[class*="CardTitle"], [class*="CardDescription"] {
-  color: var(--ivory);
-}
-button {
-  color: inherit;
+/* All-caps label style */
+.label-caps {
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
 }
 
-/* Stat rail — horizontal strip with brass column dividers */
+/* Stat rail — horizontal strip (admin/legacy) */
 .stat-rail {
   display: grid;
-  border: 1px solid rgba(201,169,97,0.18);
-  box-shadow: inset 0 1px 0 rgba(201,169,97,0.2);
+  border: 1px solid rgba(184,148,62,0.18);
+  box-shadow: inset 0 1px 0 rgba(184,148,62,0.2);
   background: rgba(0,0,0,0.3);
 }
 .stat-rail-cell {
@@ -144,22 +181,20 @@ button {
   top: 20%;
   height: 60%;
   width: 1px;
-  background: rgba(201,169,97,0.22);
+  background: rgba(184,148,62,0.22);
 }
 
-/* Ledger panel — sharp border, brass rim, no radius */
+/* Ledger panel (admin/legacy) */
 .ledger-panel {
   background: rgba(0,0,0,0.28);
-  border: 1px solid rgba(201,169,97,0.18);
-  box-shadow: inset 0 1px 0 rgba(201,169,97,0.2);
+  border: 1px solid rgba(184,148,62,0.18);
+  box-shadow: inset 0 1px 0 rgba(184,148,62,0.2);
 }
 
-/* All-caps label style */
-.label-caps {
-  font-family: var(--font-mono), monospace;
-  font-size: 0.625rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--brass);
-  font-variant-numeric: tabular-nums;
+/* shadcn overrides */
+[class*="CardTitle"], [class*="CardDescription"] {
+  color: var(--ivory);
+}
+button {
+  color: inherit;
 }

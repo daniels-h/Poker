@@ -10,19 +10,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Felt palette
-        felt: '#162e22',
-        'felt-deep': '#0d1f17',
-        'felt-lit': '#1e5038',
-        wood: '#1e0e06',
-        'wood-lit': '#3a1c0a',
-        brass: '#c9a961',
-        'brass-dim': '#7a6535',
-        ivory: '#f4ecd8',
-        'ivory-dim': '#c8bb9a',
-        ink: '#1a1410',
-        win: '#4dbe6a',
-        loss: '#d45a50',
+        // Handover design tokens
+        'bg-darkest': '#1a1a18',
+        'bg-dark': '#1e1e1c',
+        'bg-card': '#252420',
+        'felt-green': '#2a4a2a',
+        brass: '#b8943e',
+        'brass-dark': '#8a6d2a',
+        ivory: '#f5f0e8',
+        'ivory-dim': '#a09882',
+        ink: '#1a1a18',
+        win: '#4a7c59',
+        loss: '#b44040',
+        // Legacy aliases
+        felt: '#1e1e1c',
+        'felt-deep': '#1a1a18',
+        'felt-lit': '#2a4a2a',
+        wood: '#1a1a18',
+        'wood-lit': '#252420',
+        'brass-dim': '#8a6d2a',
 
         // shadcn tokens
         background: 'hsl(var(--background))',
@@ -39,9 +45,12 @@ const config: Config = {
         ring: 'hsl(var(--ring))',
       },
       fontFamily: {
-        fraunces: ['Fraunces', 'serif'],
-        inter: ['Inter', 'sans-serif'],
-        mono: ['JetBrains Mono', 'monospace'],
+        playfair: ['var(--font-playfair)', 'Playfair Display', 'Georgia', 'serif'],
+        'dm-sans': ['var(--font-dm-sans)', 'DM Sans', 'Helvetica', 'sans-serif'],
+        mono: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
+        // Legacy aliases used by admin pages
+        fraunces: ['var(--font-playfair)', 'Playfair Display', 'Georgia', 'serif'],
+        inter: ['var(--font-dm-sans)', 'DM Sans', 'Helvetica', 'sans-serif'],
       },
       borderRadius: {
         lg: '4px',

@@ -1,119 +1,88 @@
 import { createClient } from '@/lib/supabase/server'
-import PageHeader from '@/components/felt/PageHeader'
-import SessionRow from '@/components/felt/SessionRow'
-import { formatPeso } from '@/lib/format'
-import { computeHeroVillain } from '@/lib/stats'
+import SessionAccordion from '@/components/felt/SessionAccordion'
 import Link from 'next/link'
-import SessionsFilter from './SessionsFilter'
 
 export const revalidate = 0
 
-export default async function SessionsPage({ searchParams }: { searchParams: { year?: string; month?: string } }) {
+export default async function SessionsPage() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let query = supabase
+  const { data: sessions } = await supabase
     .from('sessions')
     .select(`*, session_players(total_buyin, cashout, net, player_id, player:players(id, name))`)
     .order('date', { ascending: false })
 
-  if (searchParams.year) {
-    query = query.gte('date', `${searchParams.year}-01-01`).lte('date', `${searchParams.year}-12-31`)
-  }
-  if (searchParams.month) {
-    const [y, m] = searchParams.month.split('-')
-    const lastDay = new Date(Number(y), Number(m), 0).getDate()
-    query = query.gte('date', `${y}-${m}-01`).lte('date', `${y}-${m}-${lastDay}`)
-  }
-
-  const { data: sessions } = await query
-
-  const { data: allData } = await supabase
-    .from('sessions')
-    .select('session_players(total_buyin, player_id)')
-
-  const totalSessions = (allData ?? []).length
-  const totalVolume = (allData ?? []).reduce((sum: number, s: any) =>
-    sum + (s.session_players ?? []).reduce((s2: number, sp: any) => s2 + (sp.total_buyin ?? 0), 0), 0)
-  const activeRail = new Set((allData ?? []).flatMap((s: any) =>
-    (s.session_players ?? []).map((sp: any) => sp.player_id))).size
-
-  const enriched = (sessions ?? []).map((s: any, i: number) => {
-    const sps = s.session_players ?? []
-    const total_buyin = sps.reduce((sum: number, sp: any) => sum + (sp.total_buyin ?? 0), 0)
-    const total_cashout = sps.reduce((sum: number, sp: any) => sum + (sp.cashout ?? 0), 0)
-    const flatSps = sps.map((sp: any) => ({ player_id: sp.player_id, name: sp.player?.name ?? '?', net: sp.net ?? 0 }))
-    const { hero, villain } = computeHeroVillain(flatSps)
-    return { ...s, total_buyin, is_balanced: total_buyin === total_cashout, player_count: sps.length, hero, villain, index: totalSessions - i }
+  const enriched = (sessions ?? []).map((s: any) => {
+    const sps: any[] = s.session_players ?? []
+    const results = [...sps]
+      .sort((a, b) => (b.net ?? 0) - (a.net ?? 0))
+      .map((sp: any) => ({
+        player_id: sp.player_id,
+        name: sp.player?.name ?? '?',
+        net: sp.net ?? 0,
+      }))
+    const avg_buyin = sps.length > 0
+      ? Math.round(sps.reduce((sum: number, sp: any) => sum + (sp.total_buyin ?? 0), 0) / sps.length)
+      : 0
+    return {
+      id: s.id,
+      date: s.date,
+      name: s.name,
+      notes: s.notes ?? null,
+      player_count: sps.length,
+      avg_buyin,
+      results,
+    }
   })
 
   return (
-    <div className="max-w-5xl">
-      <PageHeader
-        eyebrow="The Book"
-        title="Sessions"
-        subtitle="Every hand we've logged since we started keeping score."
-        right={user ? (
-          <Link
-            href="/admin/sessions/new"
-            className="font-mono uppercase transition-colors duration-100"
-            style={{ fontSize: 10, letterSpacing: '0.18em', background: 'var(--brass)', color: 'var(--ink)', padding: '9px 18px', fontWeight: 600 }}
-          >
-            + Log Session
-          </Link>
-        ) : undefined}
-      />
+    <div className="page-wrap">
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 40px' }}>
+        {/* Section header */}
+        <div style={{ marginBottom: 32, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <h2 style={{
+              fontFamily: 'var(--font-playfair), "Playfair Display", Georgia, serif',
+              fontSize: 32, fontWeight: 700, color: '#f5f0e8', margin: 0,
+            }}>Sessions</h2>
+            <p style={{
+              fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+              fontSize: 15, color: '#706b5f', marginTop: 6,
+            }}>Full history of all club sessions</p>
+            <div style={{
+              width: 60, height: 3, background: '#b8943e', borderRadius: 2, marginTop: 12,
+            }} />
+          </div>
+          {user && (
+            <Link
+              href="/admin/sessions/new"
+              style={{
+                fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+                fontSize: 12, letterSpacing: '0.12em', textTransform: 'uppercase',
+                background: '#b8943e', color: '#1a1a18',
+                padding: '9px 18px', fontWeight: 700, textDecoration: 'none',
+                borderRadius: 6,
+              }}
+            >
+              + Log Session
+            </Link>
+          )}
+        </div>
 
-      {/* Stat rail */}
-      <div
-        className="stat-rail mb-8"
-        style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}
-      >
-        <div className="stat-rail-cell">
-          <div className="label-caps mb-2">Total Sessions</div>
-          <div className="font-mono" style={{ fontSize: 28, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
-            {totalSessions}
-          </div>
-        </div>
-        <div className="stat-rail-cell">
-          <div className="label-caps mb-2">All-Time Volume</div>
-          <div className="font-mono" style={{ fontSize: 28, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
-            {formatPeso(totalVolume)}
-          </div>
-        </div>
-        <div className="stat-rail-cell">
-          <div className="label-caps mb-2">Active Rail</div>
-          <div className="font-mono" style={{ fontSize: 28, fontWeight: 500, color: 'var(--ivory)', lineHeight: 1 }}>
-            {activeRail}
-          </div>
-        </div>
+        <SessionAccordion sessions={enriched} />
       </div>
 
-      <SessionsFilter />
-
-      <div className="mt-5" style={{ border: '1px solid rgba(201,169,97,0.18)', boxShadow: 'inset 0 1px 0 rgba(201,169,97,0.18)', overflow: 'hidden' }}>
-        {enriched.length === 0 ? (
-          <p className="font-fraunces italic text-center py-16" style={{ color: 'var(--ivory-dim)', fontSize: 16 }}>
-            No sessions yet. The books are open.
-          </p>
-        ) : (
-          enriched.map((s: any) => (
-            <SessionRow
-              key={s.id}
-              index={s.index}
-              id={s.id}
-              name={s.name}
-              date={s.date}
-              notes={s.notes}
-              playerCount={s.player_count}
-              totalBuyin={s.total_buyin}
-              isBalanced={s.is_balanced}
-              hero={s.hero}
-              villain={s.villain}
-            />
-          ))
-        )}
-      </div>
+      {/* Footer */}
+      <footer style={{
+        background: '#1a1a18', borderTop: '2px solid #b8943e',
+        padding: '32px 40px', textAlign: 'center',
+        fontFamily: 'var(--font-dm-sans), "DM Sans", sans-serif',
+        color: '#706b5f', fontSize: 13, marginTop: 48,
+      }}>
+        <span style={{ color: '#b8943e', marginRight: 8 }}>♠♥♦♣</span>
+        Poker Open Play © 2026 — All rights reserved
+      </footer>
     </div>
   )
 }
